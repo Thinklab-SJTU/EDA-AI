@@ -49,7 +49,7 @@ python main.py --task "place" --algo ppo --use-gae --lr 2.5e-4 --clip-param 0.1 
 ### Joint Macro/Standard cell Placement
 
 ```bash
-python DeepPlace/main.py --task "fullplace" --algo ppo --use-gae --lr 2.5e-4 --clip-param 0.1 --value-loss-coef 0.5 --num-processes 1 --num-steps 2840 --num-mini-batch 4 --log-interval 1 --use-linear-lr-decay --entropy-coef 0.01
+python EDA-AI/main.py --task "fullplace" --algo ppo --use-gae --lr 2.5e-4 --clip-param 0.1 --value-loss-coef 0.5 --num-processes 1 --num-steps 2840 --num-mini-batch 4 --log-interval 1 --use-linear-lr-decay --entropy-coef 0.01
 ```
 
 ### Validation
