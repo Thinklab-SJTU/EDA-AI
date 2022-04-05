@@ -140,7 +140,7 @@ def main():
             rollouts.insert(obs, recurrent_hidden_states, action,
                             action_log_prob, value, reward, masks, bad_masks)
             if done:
-                episode_rewards.append(reward)
+                episode_rewards.append(reward.data())
                 obs = envs.reset()
                 features = torch.zeros(710, 2)
 
