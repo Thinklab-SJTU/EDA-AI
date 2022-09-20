@@ -147,9 +147,9 @@ def place(params):
 
 
 def write(res):
-    dic = np.load('./DeepPlace/data/3_dic.npy', allow_pickle=True).item()
+    dic = np.load('./EDA-AI/data/3_dic.npy', allow_pickle=True).item()
     f = open("./benchmarks/ispd2005/adaptec3/adaptec3.pl", "w")
-    with open("./DeepPlace/data/adaptec3.pl", "r") as f2:
+    with open("./EDA-AI/data/adaptec3.pl", "r") as f2:
         for line in f2:
             line = line.strip()
             l = line.split()
@@ -224,9 +224,9 @@ class Placememt():
         self.obs = torch.zeros((1, 1, self.n, self.n))
         self.results = []
         self.best = -500
-        self.f = open("./DeepPlace/result/result.txt", 'w')
+        self.f = open("./EDA-AI/result/result.txt", 'w')
 
-        f = open("./DeepPlace/data/n_edges_710.dat", "r")
+        f = open("./EDA-AI/data/n_edges_710.dat", "r")
         for line in f:
             self.net = eval(line)
         self.seed()
