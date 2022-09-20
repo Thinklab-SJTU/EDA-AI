@@ -140,7 +140,7 @@ def main():
             rollouts.insert(obs, recurrent_hidden_states, action,
                             action_log_prob, value, reward, masks, bad_masks)
             if done:
-                episode_rewards.append(reward.data())
+                episode_rewards.append(reward)
                 obs = envs.reset()
                 features = torch.zeros(710, 2)
 
@@ -192,9 +192,9 @@ def main():
                 "Updates {}, num timesteps {}, FPS {} \n Last {} training episodes: mean/median reward {:.1f}/{:.1f}, min/max reward {:.1f}/{:.1f}\n"
                 .format(j, total_num_steps,
                         int(total_num_steps / (end - start)),
-                        len(episode_rewards), np.mean(episode_rewards),
-                        np.median(episode_rewards), np.min(episode_rewards),
-                        np.max(episode_rewards), dist_entropy, value_loss,
+                        len(episode_rewards), torch.mean(torch.stack(list(episode_rewards))),
+                        torch.median(torch.stack(list(episode_rewards))), torch.min(torch.stack(list(episode_rewards))),
+                        torch.max(torch.stack(list(episode_rewards))), dist_entropy, value_loss,
                         action_loss))
 
         if (args.eval_interval is not None and len(episode_rewards) > 1
