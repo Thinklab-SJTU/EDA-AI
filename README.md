@@ -64,3 +64,17 @@ python validation.py --task "place" --num-processes 1 --num-mini-batch 1 --num-s
 ![pretraining](imgs/ab_fig.png)
 
 ![fullplace](imgs/fin_fig2.png)
+
+## Citations
+
+If you find our paper/code useful in your research, please citing
+```
+@article{cheng2021joint,
+  title={On Joint Learning for Solving Placement and Routing in Chip Design},
+  author={Cheng, Ruoyu and Yan, Junchi},
+  journal={Advances in Neural Information Processing Systems},
+  volume={34},
+  pages={16508--16519},
+  year={2021}
+}
+```
