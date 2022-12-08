@@ -1,7 +1,4 @@
-# DeepPlace
-
-An end-to-end learning approach DeepPlace for placement problem with two stages. The deep reinforcement learning (DRL) agent places the macros sequentially, followed by a gradient-based optimization placer to arrange millions of standard cells. We use [PPO](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail) for all the experiments implemented with Pytorch, and the GPU version of
-[DREAMPlace](https://github.com/limbo018/DREAMPlace) is adopted as gradient based optimization placer for arranging standard cells.
+### Implementation of NeurIPS 2021 paper "On Joint Learning for Solving Placement and Routing in Chip Design" (*DeepPlace*) and NeurIPS 2022 paper "The Policy-gradient Placement and Generative Routing Neural Networks for Chip Design" (*PRNet*)
 
 ## Citations
 
