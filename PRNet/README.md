@@ -1,4 +1,5 @@
 # PRNet
+### Implementation of NeurIPS 2022 paper "The Policy-gradient Placement and Generative Routing Neural Networks for Chip Design"
 
 A neural mixed-size placement and routing pipeline **PRNet**. The placement part is fulfilled by a policy gradient based RL method for macros by considering their sizes. The routing is achieved by one-shot generation of the whole path, with our devised net order learning module to dynamically adjust the routing order. We use [PPO](https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail) for all the experiments implemented with Pytorch, and the GPU version of
 [DREAMPlace](https://github.com/limbo018/DREAMPlace) is adopted as gradient based optimization placer for arranging standard cells.
