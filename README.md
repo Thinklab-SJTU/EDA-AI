@@ -1,4 +1,6 @@
-### Implementation of NeurIPS 2021 paper "On Joint Learning for Solving Placement and Routing in Chip Design" (*DeepPlace*) and NeurIPS 2022 paper "The Policy-gradient Placement and Generative Routing Neural Networks for Chip Design" (*PRNet*)
+### Implementation of 
+- NeurIPS 2021 paper "On Joint Learning for Solving Placement and Routing in Chip Design" (*DeepPlace*)
+- NeurIPS 2022 paper "The Policy-gradient Placement and Generative Routing Neural Networks for Chip Design" (*PRNet*)
 
 ## Citations
 
