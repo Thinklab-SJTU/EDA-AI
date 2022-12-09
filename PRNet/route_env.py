@@ -331,7 +331,6 @@ def hpwl(r, x, n, base, rate):
         wl += wn + hn
     con = list(con.flatten())
     con.sort(reverse=True)
-    print(wl)
     return -(wl-base) * rate, np.mean(con[:64])
 
 
