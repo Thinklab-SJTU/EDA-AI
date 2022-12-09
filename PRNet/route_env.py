@@ -154,7 +154,7 @@ def get_training_set(nets, result):
 def train_model(training_set):
     index = np.random.permutation(len(training_set))
     for i in index:
-        real_A, real_B = training_set[i]
+        real_A, real_B = training_set[i].to('cuda:0')
         model.real_A = real_A
         model.real_B = real_B
         # model.set_input(data)
@@ -190,7 +190,7 @@ def get_cgan_reward(nets, result, base, rate):
     cap_x = torch.zeros((64, 64))
     cap_y = torch.zeros((64, 64))
     for net in nets:
-        inpt = get_input(net, result, cap_x, cap_y)
+        inpt = get_input(net, result, cap_x, cap_y).to('cuda:0')
         model.real_A = model.real_B = inpt
         model.forward()
         wl += model.fake_length.item()
