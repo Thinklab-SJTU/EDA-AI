@@ -154,9 +154,9 @@ def get_training_set(nets, result):
 def train_model(training_set):
     index = np.random.permutation(len(training_set))
     for i in index:
-        real_A, real_B = training_set[i].to('cuda:0')
-        model.real_A = real_A
-        model.real_B = real_B
+        real_A, real_B = training_set[i]
+        model.real_A = real_A.to('cuda:0')
+        model.real_B = real_B.to('cuda:0')
         # model.set_input(data)
         model.optimize_parameters()
 
