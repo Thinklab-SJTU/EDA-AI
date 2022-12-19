@@ -24,6 +24,7 @@ class InferenceModel(BaseModel):
 
         # assigns the model to self.netG_[suffix] so that it can be loaded
         # please see <BaseModel.load_networks>
+        self.load_networks('latest')
 
     def initialize(self, epoch):
         load_filename = '%s_net_%s.pth' % (epoch, 'G')
