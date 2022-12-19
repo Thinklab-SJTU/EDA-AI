@@ -38,12 +38,19 @@ class InferenceModel(BaseModel):
         print('Loading succeeded.')
 
     def set_input(self, input):
-        self.real_A = input.to(self.device)
+        self.real_A = input['A'].to(self.device)
+        self.real_B = input['B'].to(self.device)
+        self.real_label = (self.real_B + 1.) / 2.
 
     def forward(self):
         """Run forward pass."""
-        self.fake_B = self.netG(self.real_A)  # G(real)
+        self.fake_B = self.netG(self.real_A)  # G(A)
 
+        # record the legally generated images in the current epoch
+        self.current_correctness = utils.constraint_label(self.real_A.cpu(),
+                                                          self.fake_B.cpu()).unsqueeze(-1).to(self.device)
+        # compute the total effective length of labeled and generated routes
+        self.realB_length = (self.real_B / 2 + 0.5).view(self.real_B.size(0), -1).sum(1).unsqueeze(-1)
         self.fake_length = torch.round(self.fake_B / 2 + 0.5).view(self.fake_B.size(0), -1).sum(1).unsqueeze(-1)
 
     def optimize_parameters(self):
