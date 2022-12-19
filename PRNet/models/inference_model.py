@@ -19,7 +19,8 @@ class InferenceModel(BaseModel):
         BaseModel.__init__(self, opt)
         self.gpu_ids = opt.gpu_ids
         self.device = torch.device('cuda:{}'.format(self.gpu_ids[0])) if self.gpu_ids else torch.device('cpu')
-        self.netG = networks.define_G(3, 1, 64, opt.netG, 'batch', True, 'normal', 0.02, self.gpu_ids)
+        self.netG = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
+                                      not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
         self.pretrained_path = opt.path
 
         # assigns the model to self.netG_[suffix] so that it can be loaded
