@@ -15,7 +15,6 @@ class InferenceModel(BaseModel):
         Parameters:
             opt (Option class)-- stores all the experiment flags; needs to be a subclass of BaseOptions
         """
-        super().__init__()
         assert (not opt.isTrain)
         BaseModel.__init__(self, opt)
         self.gpu_ids = opt.gpu_ids
