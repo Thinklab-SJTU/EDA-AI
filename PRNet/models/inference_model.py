@@ -1,4 +1,5 @@
 from . import networks
+from .base_model import BaseModel
 import torch
 import os
 import torch.nn as nn
@@ -6,7 +7,7 @@ from utils import utils
 from abc import ABC
 
 
-class InferenceModel(nn.Module):
+class InferenceModel(BaseModel):
 
     def __init__(self, opt):
         """Initialize the inference model.
@@ -16,6 +17,7 @@ class InferenceModel(nn.Module):
         """
         super().__init__()
         assert (not opt.isTrain)
+        BaseModel.__init__(self, opt)
         self.gpu_ids = opt.gpu_ids
         self.device = torch.device('cuda:{}'.format(self.gpu_ids[0])) if self.gpu_ids else torch.device('cpu')
         self.netG = networks.define_G(3, 1, 64, opt.netG, 'batch', True, 'normal', 0.02, self.gpu_ids)
@@ -34,7 +36,15 @@ class InferenceModel(nn.Module):
 
         print('Loading succeeded.')
 
-    def forward(self, x):
-        """Run forward pass."""
+    def set_input(self, input):
+        self.real_A = input.to(self.device)
 
-        return self.netG(x)
+    def forward(self):
+        """Run forward pass."""
+        self.fake_B = self.netG(self.real_A)  # G(real)
+
+        self.fake_length = torch.round(self.fake_B / 2 + 0.5).view(self.fake_B.size(0), -1).sum(1).unsqueeze(-1)
+
+    def optimize_parameters(self):
+        pass
+
