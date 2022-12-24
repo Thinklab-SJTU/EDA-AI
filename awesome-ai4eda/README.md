@@ -13,13 +13,13 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
 <tr><td colspan="2"><a href="#problems">2. Problems</a></td></tr> 
 
 <tr>
-	<td>&emsp;<a href=#quadratic-assignment-problem>2.1 Placement</a></td>
+	<td>&emsp;<a href=#Placement>2.1 Placement</a></td>
 	<td>&emsp;<a href=#Optimization>2.2 Optimization</a></td>
 </tr>
     
 <tr>
-	<td>&emsp;<a href=#graph-matching>2.3 Routing</a></td>
-	<td>&emsp;<a href=#quadratic-assignment-problem>2.4 PPA Prediction</a></td>
+	<td>&emsp;<a href=#Routing>2.3 Routing</a></td>
+	<td>&emsp;<a href=#PPA-Prediction>2.4 PPA Prediction</a></td>
 </tr>
 </table>
 
