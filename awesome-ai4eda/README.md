@@ -18,8 +18,8 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
 </tr>
     
 <tr>
-	<td>&emsp;<a href=#Logic-Synthesis:-Operator-Optimization>2.3 Logic Synthesis: Operator Optimization</a></td>
-	<td>&emsp;<a href=#Logic-Synthesis:-Operator-Sequence-Scheduling>2.4 Logic Synthesis: Operator  Sequence Scheduling</a></td>
+	<td>&emsp;<a href=#Logic-Synthesis-Operator-Optimization>2.3 Logic Synthesis: Operator Optimization</a></td>
+	<td>&emsp;<a href=#Logic-Synthesis-Operator-Sequence-Scheduling>2.4 Logic Synthesis: Operator  Sequence Scheduling</a></td>
 </tr>
 
 <tr>
