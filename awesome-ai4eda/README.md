@@ -14,12 +14,16 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
 
 <tr>
 	<td>&emsp;<a href=#Placement>2.1 Placement</a></td>
-	<td>&emsp;<a href=#Optimization>2.2 Optimization</a></td>
+	<td>&emsp;<a href=#Routing>2.2 Routing</a></td>
 </tr>
     
 <tr>
-	<td>&emsp;<a href=#Routing>2.3 Routing</a></td>
-	<td>&emsp;<a href=#PPA-Prediction>2.4 PPA Prediction</a></td>
+	<td>&emsp;<a href=#Logic-Synthesis:-Operator-Optimization>2.3 Logic Synthesis: Operator Optimization</a></td>
+	<td>&emsp;<a href=#Logic-Synthesis:-Operator-Sequence-Scheduling>2.4 Logic Synthesis: Operator  Sequence Scheduling</a></td>
+</tr>
+
+<tr>
+    <td>&emsp;<a href=#PPA-Prediction>2.5 PPA Prediction</a></td>
 </tr>
 </table>
 
@@ -55,11 +59,11 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
     
 3. **Placement Optimization via PPA-Directed Graph Clustering**. MLCAD, 22. [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9900089)
 
-    *Yi-Chen Lu; Tian Yang; Sung Kyu Lim; Haoxing Ren*
+    *Yi-Chen Lu, Tian Yang, Sung Kyu Lim, Haoxing Ren*
     
 4. **MaskPlace: Fast Chip Placement via Reinforced Visual Representation Learning**. NeurIPS, 22. [paper](https://openreview.net/pdf?id=T2DBbSh6_uY)
 
-    *Yao Lai Yao Mu Ping Luo*
+    *Yao Lai, Yao Mu, Ping Luo*
 
 5. **A graph placement methodology for fast chip design**. Nature, 21. [paper](https://www.nature.com/articles/s41586-021-03544-w.pdf)
 
@@ -83,8 +87,17 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
 
     *Yu-Hung Huang, Zhiyao Xie, Guan-Qi Fang, Tao-Chun Yu, Haoxing Ren, Shao-Yun Fang, Yiran Chen, Jiang Hu*
 
+### [Routing](#content)
 
-### [Optimization](#content)
+1. ✨**On Joint Learning for Solving Placement and Routing in Chip Design**. NeurIPS, 21. [paper](https://proceedings.neurips.cc/paper/2021/file/898aef0932f6aaecda27aba8e9903991-Paper.pdf), [code](https://github.com/Thinklab-SJTU/EDA-AI/tree/main/DeepPlace.)
+
+    *Ruoyu Cheng, Junchi Yan*
+    
+2. ✨**The Policy-gradient Placement and Generative Routing Neural Networks for Chip Design**, NeurIPS, 22. [paper](https://openreview.net/pdf?id=uNYqDfPEDD8), [code](https://github.com/Thinklab-SJTU/EDA-AI/tree/main/PRNet)
+
+    *Ruoyu Cheng, Xianglong Lyu, Yang Li, Junjie Ye, Jianye HAO, Junchi Yan*
+
+### [Logic Synthesis: Operator Sequence Scheduling](#content)
 
 1. **PIMap: A flexible framework for improving LUT-based technology mapping via parallelized iterative optimization**. TRETS, 19. [paper](https://dl.acm.org/doi/pdf/10.1145/3268344)
 
@@ -117,17 +130,17 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
 8. **Batch Sequential Black-box Optimization with Embedding Alignment Cells for Logic Synthesis**. ICCAD, 22.
 
     *Chang Feng, Wenlong Lyu, Zhitang Chen, Junjie Ye, Mingxuan Yuan, Jianye Hao*
-
-
-### [Routing](#content)
-
-1. ✨**On Joint Learning for Solving Placement and Routing in Chip Design**. NeurIPS, 21. [paper](https://proceedings.neurips.cc/paper/2021/file/898aef0932f6aaecda27aba8e9903991-Paper.pdf), [code](https://github.com/Thinklab-SJTU/EDA-AI/tree/main/DeepPlace.)
-
-    *Ruoyu Cheng, Junchi Yan*
     
-2. ✨**The Policy-gradient Placement and Generative Routing Neural Networks for Chip Design**, NeurIPS, 22. [paper](https://openreview.net/pdf?id=uNYqDfPEDD8), [code](https://github.com/Thinklab-SJTU/EDA-AI/tree/main/PRNet)
+### [Logic Synthesis: Operator Optimization](#content)
 
-    *Ruoyu Cheng, Xianglong Lyu, Yang Li, Junjie Ye, Jianye HAO, Junchi Yan*
+1. **SLAP: A Supervised Learning Approach for Priority Cuts Technology Mapping**. DAC, 21.
+
+    *Walter Lau Neto, Matheus T. Moreira, Yingjie Li, Luca Amaru, Cunxi Yu, Pierre-Emmanuel Gaillardon*
+    
+2. **Improving LUT-based Optimization for ASICs**. DAC, 22.
+
+    *Walter Lau Neto, Luca Amaru, Vinicius Possani, Patrick Vuillod, Jiong Luo, Alan Mishchenko, Pierre-Emmanuel Gaillardon*
+
 
 ### [PPA Prediction](#content)
 
@@ -141,7 +154,7 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
     
 3. **Doomed Run Prediction in Physical Design by Exploiting Sequential Flow and Graph Learning**. ICCAD, 21. [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9643435)
 
-    *Yi-Chen Lu; Siddhartha Nath; Vishal Khandelwal; Sung Kyu Lim*
+    *Yi-Chen Lu, Siddhartha Nath, Vishal Khandelwal, Sung Kyu Lim*
     
 4. **CongestionNet: Routing Congestion Prediction Using Deep Graph Neural Networks**. VLSI-SoC, 19. [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8920342)
 
@@ -157,7 +170,7 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
     
 7. **Machine Learning-Based Pre-Routing Timing Prediction with Reduced Pessimism**. DAC, 2019. [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8807063)
 
-    *Erick Carvajal Barboza; Nishchal Shukla; Yiran Chen; Jiang Hu*
+    *Erick Carvajal Barboza, Nishchal Shukla, Yiran Chen, Jiang Hu*
     
 8. **Preplacement Net Length and Timing Estimation by Customized Graph Neural Network**. TCAD, 22. [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9707500)
 
@@ -169,7 +182,7 @@ We mark work contributed by [Thinklab](http://thinklab.sjtu.edu.cn) with ✨.
     
 10. **Placement Optimization via PPA-Directed Graph Clustering**. MLCAD, 22. [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9900089)
 
-    *Yi-Chen Lu; Tian Yang; Sung Kyu Lim; Haoxing Ren*
+    *Yi-Chen Lu, Tian Yang, Sung Kyu Lim, Haoxing Ren*
     
 11. **NoCeption: A Fast PPA Prediction Framework for Network-on-Chips Using Graph Neural Network**. DATE, 22. [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=9774525)
 
