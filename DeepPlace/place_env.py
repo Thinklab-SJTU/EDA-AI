@@ -114,7 +114,10 @@ class Placememt():
     def reset(self):
         self.obs = torch.zeros((1, 1, self.n, self.n))
         return self.obs
-
+    
+    def to(self, device):
+        self.obs = self.obs.to(device)
+        
     def transform(self, x):
         up = nn.Upsample(size=84, mode='bilinear', align_corners=False)
         return up(x)*255
