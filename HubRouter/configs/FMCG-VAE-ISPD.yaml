@@ -1,0 +1,43 @@
+base:
+  seed: 2
+  ckpt_path: None
+  ckpt_dir: checkpoint/
+  log_dir: logs/
+  result_dir: result/
+  model_name: FMCG_VAE_ISPD_64
+  batch_size: 64
+  max_epochs: 200
+  latent_size: 64
+
+model:
+  loss_ema: True
+  lr: 0.0001
+  lr_decay_steps: 10
+  lr_decay_rate: 0.96
+  num_sample: 10
+  vae_config:
+    target: models.vae.VAE
+    params:
+      in_channels: 4
+      out_channels: 1
+      c_in_channels: 3
+      latent_size: 64
+      ngf: 64
+      n_downsampling: 2
+      use_dropout: True
+      n_blocks: 9
+      padding_type: zero
+      size: 64
+
+data:
+  num_workers: 16
+  target: data.aligned.AlignedDataset
+  params:
+    data_folder: dataset/
+    # condition_folder: adaptec1_input_128,adaptec2_input_128,adaptec3_input_128,adaptec4_input_128,adaptec5_input_128,bigblue1_input_128,bigblue2_input_128,bigblue3_input_128,bigblue4_input_128,newblue1_input_128,newblue2_input_128,newblue3_input_128,newblue4_input_128,newblue5_input_128,newblue6_input_128,newblue7_input_128
+    # route_folder: adaptec1_128,adaptec2_128,adaptec3_128,adaptec4_128,adaptec5_128,bigblue1_128,bigblue2_128,bigblue3_128,bigblue4_128,newblue1_128,newblue2_128,newblue3_128,newblue4_128,newblue5_128,newblue6_128,newblue7_128
+    # condition_folder: adaptec1_input_128,bigblue1_input_128,newblue1_input_128,adaptec2_input_128,bigblue2_input_128,newblue2_input_128
+    # route_folder: adaptec1_128,bigblue1_128,newblue1_128,adaptec2_128,bigblue2_128,newblue2_128
+    condition_folder: newblue1_input_64,adaptec2_input_64,bigblue1_input_64
+    route_folder: bigblue1_64,newblue1_64,adaptec2_64
+    max_dataset_size: 200000

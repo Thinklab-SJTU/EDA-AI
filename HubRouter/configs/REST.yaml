@@ -1,0 +1,30 @@
+base:
+  seed: 0
+  # ckpt_path: checkpoint/
+  ckpt_path: None
+  ckpt_dir: checkpoint/
+  log_dir: logs/
+  result_dir: result/
+  model_name: REST
+  batch_size: 256
+  max_epochs: 256
+  degree: 5
+  dimension: 2
+
+model:
+  lr: 0.0001
+  actor_config:
+    target: models.actor_critic.Actor
+    params:
+      degree: 5
+  critic_config:
+    target: models.actor_critic.Critic
+    params:
+      degree: 5
+
+data:
+  num_workers: 16
+  target: data.RSMT.RSMTDataset
+  params:
+    degree: 5
+    dimension: 2

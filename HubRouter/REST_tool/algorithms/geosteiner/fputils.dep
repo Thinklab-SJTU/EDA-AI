@@ -1,0 +1,1 @@
+fputils.o fputils.lo fputils.dep : fputils.c fputils.h gsttypes.h logic.h

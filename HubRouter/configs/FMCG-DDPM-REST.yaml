@@ -1,0 +1,46 @@
+base:
+  seed: 0
+  # ckpt_path: checkpoint/
+  ckpt_path: None
+  ckpt_dir: checkpoint/
+  log_dir: logs/
+  result_dir: result/
+  model_name: FMCG_DDPM_REST_64
+  batch_size: 64
+  max_epochs: 200
+
+model:
+  loss_ema: True
+  lr: 0.0001
+  lr_decay_steps: 10
+  lr_decay_rate: 0.96
+  num_sample: 10
+  ws_test: 50,100
+  target: models.ddim.Diffusion
+  params:
+    betas: (1e-4, 0.02)
+    n_T: 500
+    drop_prob: 0.1
+    ddim_timesteps: 50
+    ddim_discr_method: uniform
+    unet_config:
+      target: models.template_models.ContextUnet
+      params:
+        size: 64
+        in_channels: 1
+        c_in_channels: 1
+        z_channels: 3
+        n_feat: 128
+        n_heads: 4
+        dim_head: 32
+        attention: True
+
+data:
+  num_workers: 16
+  target: data.aligned.AlignedDataset
+  params:
+    data_folder: dataset/
+    condition_folder: REST_input_64
+    route_folder: REST_64
+    max_dataset_size: 200000
+    restrict_c_channels: 1
