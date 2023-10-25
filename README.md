@@ -1,6 +1,7 @@
 ### Implementation of 
 - NeurIPS 2021 paper "On Joint Learning for Solving Placement and Routing in Chip Design" (*DeepPlace*)
 - NeurIPS 2022 paper "The Policy-gradient Placement and Generative Routing Neural Networks for Chip Design" (*PRNet*)
+- NeurIPS 2023 paper "HubRouter: Learning Global Routing via Hub Generation and Pin-hub Connection" (*HubRouter*)
 
 ## Citations
 
@@ -24,5 +25,14 @@ If you find our paper/code useful in your research, please citing
   volume={35},
   pages={26350--26362},
   year={2022}
+}
+```
+
+```
+@inproceedings{du2023hubrouter,
+  title = {HubRouter: Learning Global Routing via Hub Generation and Pin-hub Connection},
+  author = {Du, Xingbo and Wang, Chonghua and Zhong, Ruizhe and Yan, Junchi},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year = {2023}
 }
 ```
