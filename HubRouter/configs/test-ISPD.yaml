@@ -1,0 +1,13 @@
+data:
+  num_workers: 16
+  rsmt: GEO
+  target: data.aligned.AlignedDataset
+  params:
+    data_folder: dataset/
+    # condition_folder: newblue3_input_64,newblue4_input_64,newblue7_input_64,bigblue4_input_64
+    # route_folder: newblue3_64,newblue4_64,newblue7_64,bigblue4_64
+    # condition_folder: adaptec1_input_64,newblue1_input_64,bigblue1_input_64,adaptec2_input_64,newblue2_input_64,bigblue2_input_64
+    route_folder: adaptec1_64,newblue1_64,bigblue1_64,adaptec2_64,newblue2_64,bigblue2_64
+    condition_folder: adaptec1_input_64,newblue1_input_64,bigblue1_input_64,adaptec2_input_64,newblue2_input_64,bigblue2_input_64
+    max_dataset_size: 200000
+    restrict_dir: d
