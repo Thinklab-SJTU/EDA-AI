@@ -3,7 +3,6 @@ lightning==2.0.1.post0
 numpy==1.22.3
 omegaconf==2.3.0
 pandas==2.0.0
-Pillow==9.3.0
 Pillow==9.5.0
 torch==1.13.1
 torchvision==0.14.1
