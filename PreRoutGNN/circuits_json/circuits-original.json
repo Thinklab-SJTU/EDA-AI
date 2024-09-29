@@ -1,0 +1,23 @@
+[
+    "data/8_rat/blabla.graph.bin",
+    "data/8_rat/aes192.graph.bin",
+    "data/8_rat/salsa20.graph.bin",
+    "data/8_rat/picorv32a.graph.bin",
+    "data/8_rat/y_huff.graph.bin",
+    "data/8_rat/genericfir.graph.bin",
+    "data/8_rat/usb_cdc_core.graph.bin",
+    "data/8_rat/usbf_device.graph.bin",
+    "data/8_rat/BM64.graph.bin",
+    "data/8_rat/synth_ram.graph.bin",
+    "data/8_rat/aes256.graph.bin",
+    "data/8_rat/zipdiv.graph.bin",
+    "data/8_rat/aes128.graph.bin",
+    "data/8_rat/jpeg_encoder.graph.bin",
+    "data/8_rat/des.graph.bin",
+    "data/8_rat/wbqspiflash.graph.bin",
+    "data/8_rat/xtea.graph.bin",
+    "data/8_rat/cic_decimator.graph.bin",
+    "data/8_rat/aes_cipher.graph.bin",
+    "data/8_rat/spm.graph.bin",
+    "data/8_rat/usb.graph.bin"
+]

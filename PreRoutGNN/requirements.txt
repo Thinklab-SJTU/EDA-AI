@@ -1,0 +1,6 @@
+tensorboard==2.14.0
+einops==0.7.0
+numpy==1.23.4
+pandas==1.5.1
+torchmetrics==1.0.2
+tqdm==4.64.1

@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+PreRoutGNN/data/8_rat/*.bin
+PreRoutGNN/data_real
+tmp*
