@@ -1,0 +1,79 @@
+Outline: 1326 1205
+NumBlocks: 33                                                                   
+NumTerminals: 40
+
+bk1   336  133
+bk10a 378  119
+bk10b 161  140
+bk10c 119  49 
+bk11  175  119
+bk12  140  406
+bk13  140  497
+bk14a 196  119
+bk14b 294  119
+bk14c 161  119
+bk15a 119  266
+bk15b 119  336
+bk16  119  126
+bk17a 371  182
+bk17b 182  203
+bk18  182  203
+bk19  84   119
+bk2   133  294
+bk20  182  350
+bk21  315  140
+bk3   133  315
+bk4   560  133
+bk5a  133  140
+bk5b  175  133
+bk5c  133  231
+bk6   133  315
+bk7   182  98 
+bk8a  210  210
+bk8b  126  378
+bk9a  182  119
+bk9b  119  119
+bk9c  357  119
+bk9d  119  84 
+
+VSS terminal         1410	1610 
+VDD terminal         1856	0    
+P9 terminal          293	0        
+P8 terminal          185	0        
+P7 terminal          1015	0        
+P6 terminal          909	0        
+P5 terminal          794	0        
+P4 terminal          1125	0      
+P37 terminal         1040	1610   
+P36 terminal         786	1610   
+POW terminal         385	1610  
+P35 terminal         0	532      
+P34 terminal         0	378      
+P33 terminal         0	216      
+P32 terminal         0	686      
+P31 terminal         0	1348     
+P30 terminal         570	1610   
+P3 terminal          1294	1610   
+P29 terminal         678	1610   
+P28 terminal         1633	0    
+P27 terminal         370	1610   
+P26 terminal         1394	0    
+P25 terminal         609	0      
+P24 terminal         2264	185  
+P23 terminal         2264	948  
+P22 terminal         2264	801  
+P21 terminal         1540	1610 
+P20 terminal         1810	1610 
+P2 terminal          1240	0      
+P19 terminal         2264	1564 
+P18 terminal         2264	1502 
+P17 terminal         2264	1217 
+GND terminal         2264	154  
+P16 terminal         0	840      
+P15 terminal         0	1094      
+P14 terminal         2264	378  
+P13 terminal         2264	663  
+P12 terminal         2264	524  
+P11 terminal         501	0      
+P10 terminal         401	0     
+ 

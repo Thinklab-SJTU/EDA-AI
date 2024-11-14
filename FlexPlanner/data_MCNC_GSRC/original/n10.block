@@ -1,0 +1,85 @@
+Outline: 800 800
+NumBlocks: 10
+NumTerminals: 69
+
+sb0 199 82
+sb1 229 105
+sb2 61 117
+sb3 114 167
+sb4 91 208
+sb5 208 129
+sb6 123 108
+sb7 235 179
+sb8 152 193
+sb9 126 196
+
+p1 terminal 0 0
+p2 terminal 44 0
+p3 terminal 88 0
+p4 terminal 133 0
+p5 terminal 177 0
+p6 terminal 222 0
+p7 terminal 266 0
+p8 terminal 311 0
+p9 terminal 355 0
+p10 terminal 400 0
+p11 terminal 444 0
+p12 terminal 488 0
+p13 terminal 533 0
+p14 terminal 577 0
+p15 terminal 622 0
+p16 terminal 666 0
+p17 terminal 711 0
+p18 terminal 755 0
+p19 terminal 800 0
+p20 terminal 800 44
+p21 terminal 800 88
+p22 terminal 800 133
+p23 terminal 800 177
+p24 terminal 800 222
+p25 terminal 800 266
+p26 terminal 800 311
+p27 terminal 800 355
+p28 terminal 800 400
+p29 terminal 800 444
+p30 terminal 800 488
+p31 terminal 800 533
+p32 terminal 800 577
+p33 terminal 800 622
+p34 terminal 800 666
+p35 terminal 800 711
+p36 terminal 800 755
+p37 terminal 755 800
+p38 terminal 711 800
+p39 terminal 666 800
+p40 terminal 622 800
+p41 terminal 577 800
+p42 terminal 533 800
+p43 terminal 488 800
+p44 terminal 444 800
+p45 terminal 400 800
+p46 terminal 355 800
+p47 terminal 311 800
+p48 terminal 266 800
+p49 terminal 222 800
+p50 terminal 177 800
+p51 terminal 133 800
+p52 terminal 88 800
+p53 terminal 44 800
+p54 terminal 0 800
+p55 terminal 0 755
+p56 terminal 0 711
+p57 terminal 0 666
+p58 terminal 0 622
+p59 terminal 0 577
+p60 terminal 0 533
+p61 terminal 0 488
+p62 terminal 0 444
+p63 terminal 0 400
+p64 terminal 0 355
+p65 terminal 0 311
+p66 terminal 0 266
+p67 terminal 0 222
+p68 terminal 0 177
+p69 terminal 0 133
+

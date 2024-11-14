@@ -1,0 +1,87 @@
+Outline: 11894 6314
+NumBlocks: 9
+NumTerminals: 73
+
+cc_11 	3146	1826
+cc_12 	3146	1826
+cc_13 	3146	1826
+cc_14 	3146	1826
+cc_21 	3186	1832
+cc_22 	3186	1832
+cc_23 	3186	1832
+cc_24 	3186	1832
+clk 		826 	286
+
+new0 terminal     0	3000         
+new1 terminal     0	3480         
+new2 terminal     0	3960         
+new3 terminal     0	4440         
+new4 terminal     0	4920         
+new5 terminal     0	5400         
+new6 terminal     0	5880         
+new7 terminal     0	6360         
+new8 terminal     0	6840         
+new10 terminal    0	7320       
+new11 terminal    0	7800       
+new12 terminal    0	8280       
+new14 terminal    0	8760       
+new15 terminal    0	9240       
+new16 terminal    0	9720       
+new17 terminal    0	10200       
+new18 terminal    0	10680       
+VSS terminal      0	11160         
+new19 terminal    2040	0      
+new20 terminal    2520	0      
+new21 terminal    3000	0      
+new22 terminal    3480	0      
+new28 terminal    3960	0      
+new29 terminal    4440	0      
+new30 terminal    4920	0      
+new31 terminal    5400	0      
+new32 terminal    5880	0      
+new33 terminal    6360	0      
+new39 terminal    6840	0      
+new40 terminal    7320	0      
+new41 terminal    7800	0      
+new42 terminal    8280	0      
+new43 terminal    8760	0      
+new44 terminal    9240	0      
+new46 terminal    9720	0      
+new50 terminal    10200	0      
+VDD terminal      10680	0        
+new51 terminal    12600	3000   
+new52 terminal    12600	3480   
+new54 terminal    12600	3960   
+new55 terminal    12600	4440   
+new56 terminal    12600	4920   
+new57 terminal    12600	5400   
+new58 terminal    12600	5880   
+new59 terminal    12600	6360   
+new60 terminal    12600	6840   
+new62 terminal    12600	7320   
+new63 terminal    12600	7800   
+new64 terminal    12600	8280   
+new65 terminal    12600	8760   
+new66 terminal    12600	9240   
+new67 terminal    12600	9720   
+new69 terminal    12600	10200   
+new70 terminal    12600	10680   
+GND terminal      12600	11160     
+new71 terminal    2040	12600  
+new72 terminal    2520	12600  
+new73 terminal    3000	12600  
+new74 terminal    3480	12600  
+new75 terminal    3960	12600  
+new76 terminal    4440	12600  
+new77 terminal    4920	12600  
+new78 terminal    5400	12600  
+new79 terminal    5880	12600  
+new80 terminal    6360	12600  
+new81 terminal    6840	12600  
+new82 terminal    7320	12600  
+new83 terminal    7800	12600  
+new84 terminal    8280	12600  
+new85 terminal    8760	12600  
+new86 terminal    9240	12600  
+Phi terminal      9720	12600    
+TestHS1 terminal  10200	12600

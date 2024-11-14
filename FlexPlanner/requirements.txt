@@ -1,0 +1,9 @@
+einops==0.7.0
+gymnasium==0.29.1
+matplotlib==3.8.0
+numpy==1.26.4
+pandas==2.2.1
+scikit_learn==1.3.0
+tianshou==0.5.1
+tqdm==4.65.0
+gpustat==1.1.1

@@ -1,0 +1,297 @@
+NumNets: 70
+NetDegree: 2
+bu7
+cntu
+NetDegree: 2
+cntu
+rs2
+NetDegree: 2
+cntu
+mcu
+NetDegree: 2
+bu0
+cntu
+NetDegree: 2
+bu1
+cntu
+NetDegree: 2
+bu2
+cntu
+NetDegree: 2
+bu3
+cntu
+NetDegree: 2
+bu4
+cntu
+NetDegree: 2
+bu5
+cntu
+NetDegree: 2
+bu6
+cntu
+NetDegree: 6
+busa8
+clkc
+cntu
+npd
+nps
+ppd
+NetDegree: 6
+busa7
+clkc
+cntu
+npd
+nps
+ppd
+NetDegree: 6
+busa6
+clkc
+cntu
+npd
+nps
+ppd
+NetDegree: 6
+busa5
+clkc
+cntu
+npd
+nps
+ppd
+NetDegree: 7
+busa4
+clkc
+cmp1
+cmp2
+cmp3
+cntu
+nps
+NetDegree: 7
+busa3
+clkc
+cmp1
+cmp2
+cmp3
+cntu
+nps
+NetDegree: 7
+busa2
+clkc
+cmp1
+cmp2
+cmp3
+cntu
+nps
+NetDegree: 7
+busa1
+clkc
+cmp1
+cmp2
+cmp3
+cntu
+nps
+NetDegree: 2
+cntu
+nps
+NetDegree: 2
+cntu
+nps
+NetDegree: 2
+cntu
+nps
+NetDegree: 2
+cntu
+nps
+NetDegree: 2
+cntu
+nps
+NetDegree: 8
+clkc
+cntd
+cntu
+npd
+nps
+ppd
+pps
+vdd
+NetDegree: 4
+cntu
+mk1
+npd
+nps
+NetDegree: 8
+clkc
+cntd
+cntu
+npd
+nps
+ppd
+pps
+vss
+NetDegree: 5
+clkd
+npd
+nps
+ppd
+pps
+NetDegree: 5
+clkd
+npd
+nps
+ppd
+pps
+NetDegree: 3
+npd
+nps
+ppd
+NetDegree: 2
+gnd1
+nps
+NetDegree: 2
+nps
+vin1
+NetDegree: 2
+cmp1
+nps
+NetDegree: 2
+cmp1
+nps
+NetDegree: 4
+busb4
+clkd
+cntd
+pps
+NetDegree: 4
+busb3
+clkd
+cntd
+pps
+NetDegree: 4
+busb2
+clkd
+cntd
+pps
+NetDegree: 4
+busb1
+clkd
+cntd
+pps
+NetDegree: 2
+clkd
+mc2
+NetDegree: 3
+npd
+ppd
+pps
+NetDegree: 3
+cmp2
+npd
+ppd
+NetDegree: 3
+cmp2
+npd
+ppd
+NetDegree: 4
+cntd
+mk2
+ppd
+pps
+NetDegree: 2
+gnd2
+pps
+NetDegree: 2
+pps
+vin2
+NetDegree: 2
+cmp3
+pps
+NetDegree: 2
+cntd
+pps
+NetDegree: 2
+cntd
+pps
+NetDegree: 2
+cntd
+pps
+NetDegree: 2
+cntd
+pps
+NetDegree: 2
+cntd
+pps
+NetDegree: 2
+cmp3
+pps
+NetDegree: 2
+cntd
+rs1
+NetDegree: 2
+cntd
+mcd
+NetDegree: 2
+b0
+cntd
+NetDegree: 2
+b1
+cntd
+NetDegree: 2
+b2
+cntd
+NetDegree: 2
+b3
+cntd
+NetDegree: 2
+b4
+cntd
+NetDegree: 2
+b5
+cntd
+NetDegree: 2
+b6
+cntd
+NetDegree: 2
+b7
+cntd
+NetDegree: 4
+clkc
+cmp1
+cmp2
+cmp3
+NetDegree: 4
+clkc
+cmp1
+cmp2
+cmp3
+NetDegree: 4
+clkc
+cmp1
+cmp2
+cmp3
+NetDegree: 4
+clkc
+cmp1
+cmp2
+cmp3
+NetDegree: 4
+clkc
+cmp1
+cmp2
+cmp3
+NetDegree: 4
+clkc
+cmp1
+cmp2
+cmp3
+NetDegree: 2
+clkc
+mc1
+NetDegree: 4
+cmp1
+cmp2
+cmp3
+vdda
+NetDegree: 4
+cmp1
+cmp2
+cmp3
+vssa

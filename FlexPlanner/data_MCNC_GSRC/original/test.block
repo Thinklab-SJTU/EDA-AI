@@ -1,0 +1,11 @@
+Outline: 120 120
+NumBlocks: 4
+NumTerminals: 2
+
+A 40 50
+B 60 50
+C 60 50
+D 40 50
+
+VSS terminal 100    0   
+VDD terminal 0  100

@@ -1,0 +1,642 @@
+NumNets: 182
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 2
+BLKLL
+BLKUL
+NetDegree: 11
+BLKB
+BLKD
+BLKLL
+BLKLR
+BLKP
+BLKRC
+BLKRS
+BLKT
+BLKUL
+BLKUR
+VDD
+NetDegree: 2
+BLKT
+BLKUL
+NetDegree: 7
+BLKB
+BLKD
+BLKLL
+BLKLR
+BLKT
+BLKUL
+BLKUR
+NetDegree: 10
+BLKB
+BLKD
+BLKLL
+BLKLR
+BLKP
+BLKRC
+BLKRS
+BLKT
+BLKUL
+BLKUR
+NetDegree: 8
+BLKB
+BLKLL
+BLKP
+BLKRC
+BLKRS
+BLKT
+BLKUL
+BLKUR
+NetDegree: 3
+BLKP
+BLKUL
+BLKUR
+NetDegree: 6
+BLKB
+BLKLL
+BLKLR
+BLKT
+BLKUL
+BLKUR
+NetDegree: 2
+BLKT
+BLKUL
+NetDegree: 4
+BLKLL
+BLKRC
+BLKUL
+BLKUR
+NetDegree: 3
+BLKRC
+BLKUL
+BLKUR
+NetDegree: 3
+BLKRC
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 4
+BLKLR
+BLKP
+BLKUL
+BLKUR
+NetDegree: 4
+BLKB
+BLKP
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 3
+BLKRS
+BLKUL
+BLKUR
+NetDegree: 3
+BLKP
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKRS
+BLKUL
+NetDegree: 3
+BLKB
+BLKUL
+BLKUR
+NetDegree: 2
+BLKRS
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 3
+BLKLL
+BLKUL
+BLKUR
+NetDegree: 3
+BLKLL
+BLKUL
+BLKUR
+NetDegree: 3
+BLKLL
+BLKUL
+BLKUR
+NetDegree: 11
+BLKB
+BLKD
+BLKLL
+BLKLR
+BLKP
+BLKRC
+BLKRS
+BLKT
+BLKUL
+BLKUR
+VSS
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKRC
+BLKUL
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKUL
+BLKUR
+NetDegree: 2
+BLKLR
+BLKT
+NetDegree: 2
+BLKLR
+BLKT
+NetDegree: 2
+BLKLL
+BLKT
+NetDegree: 2
+BLKLL
+BLKT
+NetDegree: 3
+BLKB
+BLKLL
+BLKT
+NetDegree: 3
+BLKLL
+BLKP
+BLKT
+NetDegree: 2
+BLKP
+BLKT
+NetDegree: 2
+BLKLL
+BLKT
+NetDegree: 2
+BLKLL
+BLKT
+NetDegree: 2
+BLKLL
+BLKT
+NetDegree: 2
+BLKLL
+BLKT
+NetDegree: 3
+BLKLL
+BLKLR
+BLKT
+NetDegree: 3
+BLKLL
+BLKLR
+BLKT
+NetDegree: 3
+BLKLL
+BLKLR
+BLKT
+NetDegree: 3
+BLKLL
+BLKLR
+BLKT
+NetDegree: 2
+BLKLR
+BLKT
+NetDegree: 2
+BLKT
+BLKUR
+NetDegree: 2
+BLKT
+BLKUR
+NetDegree: 2
+BLKP
+BLKT
+NetDegree: 4
+BLKLL
+BLKRC
+BLKRS
+BLKT
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKLL
+BLKRC
+BLKRS
+NetDegree: 2
+BLKD
+BLKLL
+NetDegree: 2
+BLKD
+BLKLL
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 3
+BLKD
+BLKLL
+BLKLR
+NetDegree: 2
+BLKLL
+BLKLR
+NetDegree: 3
+BLKLL
+BLKLR
+BLKP
+NetDegree: 3
+BLKB
+BLKLL
+BLKLR
+NetDegree: 3
+BLKLL
+BLKLR
+BLKP
+NetDegree: 3
+BLKLL
+BLKLR
+BLKP
+NetDegree: 2
+BLKLL
+BLKLR
+NetDegree: 3
+BLKLL
+BLKLR
+BLKP
+NetDegree: 3
+BLKLL
+BLKLR
+BLKRS
+NetDegree: 2
+BLKLL
+BLKP
+NetDegree: 2
+BLKLL
+BLKLR
+NetDegree: 3
+BLKLL
+BLKLR
+BLKP
+NetDegree: 2
+BLKLL
+BLKRS
+NetDegree: 2
+BLKLL
+BLKLR
+NetDegree: 3
+BLKLL
+BLKLR
+BLKP
+NetDegree: 2
+BLKLL
+BLKLR
+NetDegree: 3
+BLKLL
+BLKRC
+BLKRS
+NetDegree: 2
+BLKLL
+BLKRS
+NetDegree: 2
+BLKLL
+BLKRS
+NetDegree: 2
+BLKLL
+BLKRS
+NetDegree: 2
+BLKLL
+BLKRS
+NetDegree: 2
+BLKLL
+BLKRS
+NetDegree: 2
+BLKLL
+BLKLR
+NetDegree: 2
+BLKLL
+BLKLR
+NetDegree: 2
+BLKD
+BLKLR
+NetDegree: 2
+BLKB
+BLKD
+NetDegree: 2
+BLKB
+BLKD
+NetDegree: 2
+BLKB
+BLKD
+NetDegree: 2
+BLKB
+BLKD
+NetDegree: 2
+BLKB
+BLKD
+NetDegree: 3
+BLKB
+BLKD
+BLKP
+NetDegree: 3
+BLKB
+BLKD
+BLKP
+NetDegree: 2
+BLKP
+BLKRS
+NetDegree: 4
+BLKB
+BLKP
+BLKRC
+BLKRS
+NetDegree: 2
+BLKP
+BLKRS
+NetDegree: 2
+BLKP
+BLKRC
+NetDegree: 3
+BLKB
+BLKRC
+BLKRS
+NetDegree: 2
+BLKRC
+BLKRS
+NetDegree: 2
+BLKRC
+BLKRS
+NetDegree: 2
+BLKRC
+BLKUR
+NetDegree: 2
+BLKRC
+BLKUR
+NetDegree: 2
+BLKRC
+BLKRS
+NetDegree: 2
+BLKLR
+BLKRC
+NetDegree: 2
+BLKLR
+BLKRS
+NetDegree: 2
+BLKLR
+BLKRS
+NetDegree: 2
+BLKLR
+BLKRS
+NetDegree: 2
+BLKLR
+BLKRS
+NetDegree: 2
+BLKLR
+BLKRS
+NetDegree: 2
+BLKLR
+BLKRS
+NetDegree: 2
+BLKLR
+BLKRS
+NetDegree: 2
+BLKRS
+BLKUR
+NetDegree: 2
+BLKRS
+BLKUR
+NetDegree: 2
+BLKRS
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
+NetDegree: 2
+BLKLR
+BLKUR
