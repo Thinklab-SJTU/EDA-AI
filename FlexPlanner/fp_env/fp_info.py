@@ -339,15 +339,3 @@ class FPInfo:
 
         self._name2alignment_group_color = name2alignment_group_color
         return name2alignment_group_color
-    
-    @property
-    def blocks_with_adjacent_terminal(self) -> List[Block]:
-        if hasattr(self, '_blocks_with_adjacent_terminal'):
-            return self._blocks_with_adjacent_terminal
-
-        blocks_with_adjacent_terminal = [blk for blk in self.block_info if blk.adjacent_terminals.__len__() > 0]
-        self._blocks_with_adjacent_terminal = blocks_with_adjacent_terminal
-        return blocks_with_adjacent_terminal
-
-
-    

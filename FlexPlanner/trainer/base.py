@@ -444,12 +444,7 @@ class BaseTrainer(ABC):
         alignment, alignment_std = test_result["alignment"], test_result["alignment_std"]
         layer_sum_first_half_seq, layer_sum_first_half_seq_std = test_result["layer_sum_first_half_seq"], test_result["layer_sum_first_half_seq_std"]
         next_layer_valid, next_layer_valid_std = test_result["next_layer_valid"], test_result["next_layer_valid_std"]
-        distance_adjacent_terminal, distance_adjacent_terminal_std = test_result["distance_adjacent_terminal"], test_result["distance_adjacent_terminal_std"]
-        blk_adj_len, blk_adj_len_std = test_result["blk_adj_len"], test_result["blk_adj_len_std"]
-        blk_adj_rew, blk_adj_rew_std = test_result["blk_adj_rew"], test_result["blk_adj_rew_std"]
-        reward_thermal, reward_thermal_std = test_result["reward_thermal"], test_result["reward_thermal_std"]
-        max_temp, max_temp_std = test_result["max_temp"], test_result["max_temp_std"]
-        mean_temp, mean_temp_std = test_result["mean_temp"], test_result["mean_temp_std"]
+
 
         if self.best_epoch < 0 or self.best_reward < rew:
             self.best_epoch = self.epoch
@@ -509,23 +504,6 @@ class BaseTrainer(ABC):
                 "test_next_layer_valid": next_layer_valid,
                 "test_next_layer_valid_std": next_layer_valid_std,
 
-                "test_distance_adjacent_terminal": distance_adjacent_terminal,
-                "test_distance_adjacent_terminal_std": distance_adjacent_terminal_std,
-
-                "test_blk_adj_len": blk_adj_len,
-                "test_blk_adj_len_std": blk_adj_len_std,
-
-                "test_blk_adj_rew": blk_adj_rew,
-                "test_blk_adj_rew_std": blk_adj_rew_std,
-
-                "test_reward_thermal": reward_thermal,
-                "test_reward_thermal_std": reward_thermal_std,
-
-                "test_max_temp": max_temp,
-                "test_max_temp_std": max_temp_std,
-
-                "test_mean_temp": mean_temp,
-                "test_mean_temp_std": mean_temp_std,
             }
         else:
             test_stat = {}

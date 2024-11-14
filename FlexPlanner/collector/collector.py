@@ -278,12 +278,7 @@ class Collector(object):
         episode_alignments = []
         episode_layer_sum_first_half_seq = []
         episode_next_layer_valid = []
-        episode_distance_adjacent_terminal = []
-        episode_blk_adj_len = []
-        episode_blk_adj_rew = []
-        episode_reward_thermal = []
-        episode_max_temp = []
-        episode_mean_temp = []
+
 
         if self.save_fig:
             self.__num_epoch += 1
@@ -394,12 +389,7 @@ class Collector(object):
                 episode_alignments.append(info_batch[env_ind_local]['alignment'])
                 episode_layer_sum_first_half_seq.append(info_batch[env_ind_local]['layer_sum_first_half_seq'])
                 episode_next_layer_valid.append(info_batch[env_ind_local]['next_layer_valid'])
-                episode_distance_adjacent_terminal.append(info_batch[env_ind_local]['distance_adjacent_terminal'])
-                episode_blk_adj_len.append(info_batch[env_ind_local]['blk_adj_len'])
-                episode_blk_adj_rew.append(info_batch[env_ind_local]['blk_adj_rew'])
-                episode_reward_thermal.append(info_batch[env_ind_local]['reward_thermal'])
-                episode_max_temp.append(info_batch[env_ind_local]['max_temp'])
-                episode_mean_temp.append(info_batch[env_ind_local]['mean_temp'])
+
 
 
                 
@@ -457,12 +447,7 @@ class Collector(object):
             alignments = np.concatenate(episode_alignments)
             layer_sum_first_half_seq = np.concatenate(episode_layer_sum_first_half_seq)
             next_layer_valid = np.concatenate(episode_next_layer_valid)
-            distance_adjacent_terminal = np.concatenate(episode_distance_adjacent_terminal)
-            blk_adj_len = np.concatenate(episode_blk_adj_len)
-            blk_adj_rew = np.concatenate(episode_blk_adj_rew)
-            reward_thermal = np.concatenate(episode_reward_thermal)
-            max_temp = np.concatenate(episode_max_temp)
-            mean_temp = np.concatenate(episode_mean_temp)
+
 
             rew_mean, rew_std = rews.mean(), rews.std()
             len_mean, len_std = lens.mean(), lens.std()
@@ -472,12 +457,7 @@ class Collector(object):
             alignment_mean, alignment_std = alignments.mean(), alignments.std()
             layer_sum_first_half_seq_mean, layer_sum_first_half_seq_std = layer_sum_first_half_seq.mean(), layer_sum_first_half_seq.std()
             next_layer_valid_mean, next_layer_valid_std = next_layer_valid.mean(), next_layer_valid.std()
-            distance_adjacent_terminal_mean, distance_adjacent_terminal_std = distance_adjacent_terminal.mean(), distance_adjacent_terminal.std()
-            blk_adj_len_mean, blk_adj_len_std = blk_adj_len.mean(), blk_adj_len.std()
-            blk_adj_rew_mean, blk_adj_rew_std = blk_adj_rew.mean(), blk_adj_rew.std()
-            reward_thermal_mean, reward_thermal_std = reward_thermal.mean(), reward_thermal.std()
-            max_temp_mean, max_temp_std = max_temp.mean(), max_temp.std()
-            mean_temp_mean, mean_temp_std = mean_temp.mean(), mean_temp.std()
+            
 
         else:
             # [LOG]
@@ -490,12 +470,7 @@ class Collector(object):
             alignments = np.array([])
             layer_sum_first_half_seq = np.array([])
             next_layer_valid = np.array([])
-            distance_adjacent_terminal = np.array([])
-            blk_adj_len = np.array([])
-            blk_adj_rew = np.array([])
-            reward_thermal = np.array([])
-            max_temp = np.array([])
-            mean_temp = np.array([])
+            
 
             rew_mean = rew_std = 0
             len_mean = len_std = 0
@@ -505,12 +480,7 @@ class Collector(object):
             alignment_mean = alignment_std = 0
             layer_sum_first_half_seq_mean = layer_sum_first_half_seq_std = 0
             next_layer_valid_mean = next_layer_valid_std = 0
-            distance_adjacent_terminal_mean = distance_adjacent_terminal_std = 0
-            blk_adj_len_mean = blk_adj_len_std = 0
-            blk_adj_rew_mean = blk_adj_rew_std = 0
-            reward_thermal_mean = reward_thermal_std = 0
-            max_temp_mean = max_temp_std = 0
-            mean_temp_mean = mean_temp_std = 0
+            
 
 
         # [LOG]
@@ -530,12 +500,7 @@ class Collector(object):
             "alignment": alignment_mean,
             "layer_sum_first_half_seq": layer_sum_first_half_seq_mean,
             "next_layer_valid": next_layer_valid_mean,
-            "distance_adjacent_terminal": distance_adjacent_terminal_mean,
-            "blk_adj_len": blk_adj_len_mean,
-            "blk_adj_rew": blk_adj_rew_mean,
-            "reward_thermal": reward_thermal_mean,
-            "max_temp": max_temp_mean,
-            "mean_temp": mean_temp_mean,
+
 
 
             "rew_std": rew_std,
@@ -546,12 +511,7 @@ class Collector(object):
             "alignment_std": alignment_std,
             "layer_sum_first_half_seq_std": layer_sum_first_half_seq_std,
             "next_layer_valid_std": next_layer_valid_std,
-            "distance_adjacent_terminal_std": distance_adjacent_terminal_std,
-            "blk_adj_len_std": blk_adj_len_std,
-            "blk_adj_rew_std": blk_adj_rew_std,
-            "reward_thermal_std": reward_thermal_std,
-            "max_temp_std": max_temp_std,
-            "mean_temp_std": mean_temp_std,
+
         }
 
 

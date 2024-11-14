@@ -95,12 +95,7 @@ def save_final_floorplan(path:str, fp_info:FPInfo, enable_text:bool=1) -> None:
     title = "HPWL = {}, original HPWL = {}".format( hpwl, int(original_hpwl) )
     alignment = fp_info.calc_alignment_score()
     overlap = fp_info.get_overlap()
-    adjacent_tml_distance = 0.0
-    adjacent_blk_length = 0.0
-    max_temp, avg_temp = 0.0, 0.0
     title += "\nAlignment rate = {:.2f}, Overlap = {:.2f}".format(alignment, overlap)
-    title += "\nAdjacent terminal distance = {:.2f}, Adjacent block length = {:.2f}".format(adjacent_tml_distance, adjacent_blk_length)
-    title += "\nMax temperature = {:.2f}, Avg temperature = {:.2f}".format(max_temp, avg_temp)
     plt.suptitle(title)
     plt.savefig(path)
     plt.close()
@@ -255,7 +250,7 @@ def save_intermediate_floorplan(path:str, curr_block:Block, canvas:torch.Tensor,
 
     
 
-    super_title = f"name = {curr_block.name}, layer = {curr_block.grid_z} \n full_idx = {curr_block.idx}, movable_idx = {curr_block.movable_idx} \n partner_indices = {curr_block.partner_indices}, adjacent_blocks = {curr_block.adjacent_blocks}, adjacent_terminals = {[t.idx for t in curr_block.adjacent_terminals]}"
+    super_title = f"name = {curr_block.name}, layer = {curr_block.grid_z} \n full_idx = {curr_block.idx}, movable_idx = {curr_block.movable_idx} \n partner_indices = {curr_block.partner_indices}"
     plt.suptitle(super_title)
 
     # save

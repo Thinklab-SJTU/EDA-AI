@@ -617,11 +617,8 @@ class PlaceEnv(gym.Env):
                     "w": block.w,
                     "h": block.h,
                     "z": block.z,
-                    "power": block.power,
                     "area": block.area,
                     "alignment_blocks": [self.fp_info.get_module_by_full_idx(pid).name for pid in block.partner_indices],
-                    "adjacent_blocks": [self.fp_info.get_module_by_full_idx(pid).name for pid in block.adjacent_blocks],
-                    "adjacent_terminals": [t.name for t in block.adjacent_terminals],
                 }])
                 df = pd.concat([df, line], ignore_index=True)
         return df
@@ -809,13 +806,6 @@ class PlaceEnv(gym.Env):
             "original_hpwl": original_hpwl,
             "overlap": overlap,
             "alignment": alignment_score if self.reward_args.reward_weight_alignment is not None else -1.0,
-            "distance_adjacent_terminal": -1.0,
-            "blk_adj_len":  -1.0,
-            "blk_adj_rew":  -1.0,
-
-            "reward_thermal": -1.0,
-            "max_temp":  -1.0,
-            "mean_temp": -1.0,
 
             "layer_sum_first_half_seq": layer_sum_first_half_seq,
             "next_layer_valid": next_layer_valid,

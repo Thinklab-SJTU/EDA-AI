@@ -4,7 +4,7 @@ from .terminal import Terminal
 
 class Block:
     def __init__(self, x:float, y:float, z:int, w:float, h:float, 
-                 name:str, preplaced:bool, virtual:bool, power:float,
+                 name:str, preplaced:bool, virtual:bool,
                  ):
         """
         x: bottom-left x
@@ -17,18 +17,12 @@ class Block:
         self.name = name
         self.preplaced = bool(preplaced)
         self.virtual = bool(virtual)
-        self.power = power
 
         # alignment, use full idx
         self.partner_indices:list[int] = []
         self.alignment_areas:dict[int,int] = dict()
         self.original_alignment_areas:dict[int,float] = dict()
 
-        # adjacent terminals
-        self.adjacent_terminals:list[Terminal] = []
-
-        # adjacent blocks, use full idx
-        self.adjacent_blocks:list[int] = []
 
         # init properties
         self.init_w, self.init_h = w, h

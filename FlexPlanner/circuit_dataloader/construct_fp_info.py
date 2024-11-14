@@ -40,7 +40,6 @@ def construct_fp_info_func(circuit:str, area_util:float, num_grid_x:int, num_gri
             "preplaced": False,
             "x": 0,
             "y": 0,
-            "power": 0,
         }
 
 
@@ -48,13 +47,10 @@ def construct_fp_info_func(circuit:str, area_util:float, num_grid_x:int, num_gri
     preplaced_blocks = []
     movable_blocks = []
     for blk_name, blk_info in blk_wh_dict.items():
-        if 'power' not in blk_info.keys():
-            blk_info['power'] = 0
-            
         if blk_info['preplaced']: # PPM
-            preplaced_blocks.append(fp_env.Block(blk_info['x'], blk_info['y'], blk_info['z'], blk_info['w'], blk_info['h'], blk_name, True, blk_info['virtual'], blk_info['power']))
+            preplaced_blocks.append(fp_env.Block(blk_info['x'], blk_info['y'], blk_info['z'], blk_info['w'], blk_info['h'], blk_name, True, blk_info['virtual']))
         else: # movable or virtual
-            movable_blocks.append(fp_env.Block(0, 0, blk_info['z'], blk_info['w'], blk_info['h'], blk_name, False, blk_info['virtual'], blk_info['power']))
+            movable_blocks.append(fp_env.Block(0, 0, blk_info['z'], blk_info['w'], blk_info['h'], blk_name, False, blk_info['virtual']))
 
     block_info = preplaced_blocks + movable_blocks
 

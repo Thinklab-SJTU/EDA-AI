@@ -42,7 +42,7 @@ def parse_blk_tml(circuit:str, area_util:float, root:str="data") -> Tuple[Dict[s
         }
 
         # optional fields
-        optional_fields = ['x', 'y', 'z', 'preplaced', 'power']
+        optional_fields = ['x', 'y', 'z', 'preplaced']
         for field in optional_fields:
             if hasattr(row, field):
                 blk_wh_dict[name][field] = getattr(row, field)
