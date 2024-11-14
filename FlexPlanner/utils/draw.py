@@ -95,9 +95,9 @@ def save_final_floorplan(path:str, fp_info:FPInfo, enable_text:bool=1) -> None:
     title = "HPWL = {}, original HPWL = {}".format( hpwl, int(original_hpwl) )
     alignment = fp_info.calc_alignment_score()
     overlap = fp_info.get_overlap()
-    adjacent_tml_distance = fp_info.get_distance_adjacent_terminal()
-    adjacent_blk_length, _ = fp_info.calc_reward_adjacent_block(0)
-    max_temp, avg_temp = fp_info.calc_temperature(None) if hasattr(fp_info, "thermal_conv") else (0, 0)
+    adjacent_tml_distance = 0.0
+    adjacent_blk_length = 0.0
+    max_temp, avg_temp = 0.0, 0.0
     title += "\nAlignment rate = {:.2f}, Overlap = {:.2f}".format(alignment, overlap)
     title += "\nAdjacent terminal distance = {:.2f}, Adjacent block length = {:.2f}".format(adjacent_tml_distance, adjacent_blk_length)
     title += "\nMax temperature = {:.2f}, Avg temperature = {:.2f}".format(max_temp, avg_temp)
@@ -116,8 +116,6 @@ def save_final_floorplan(path:str, fp_info:FPInfo, enable_text:bool=1) -> None:
 
 def save_intermediate_floorplan(path:str, curr_block:Block, canvas:torch.Tensor,
               position_mask:torch.Tensor, wiremask:torch.Tensor, alignment_mask:torch.Tensor, binary_alignment_mask:torch.IntTensor, 
-              adjacent_terminal_mask:torch.IntTensor, adjacent_block_mask:torch.IntTensor, binary_adjacent_block_mask:torch.IntTensor,
-              power_mask:torch.Tensor, thermal_mask:torch.Tensor, 
               fp_info:FPInfo, enable_text:bool=1,
               ) -> None:
     """draw and save all masks at current step."""
@@ -138,19 +136,10 @@ def save_intermediate_floorplan(path:str, curr_block:Block, canvas:torch.Tensor,
         num_axes += 1
     if binary_alignment_mask is not None:
         num_axes += 1
-    if adjacent_terminal_mask is not None:
-        num_axes += 1
-    if adjacent_block_mask is not None:
-        num_axes += 1
-    if binary_adjacent_block_mask is not None:
-        num_axes += 1
-    masks_for_available_mask = list(filter(lambda x: x is not None, [position_mask, binary_alignment_mask, adjacent_terminal_mask, binary_adjacent_block_mask]))
+    masks_for_available_mask = list(filter(lambda x: x is not None, [position_mask, binary_alignment_mask]))
     if len(masks_for_available_mask) > 0: # available mask
         num_axes += 1
-    if power_mask is not None:
-        num_axes += num_layer
-    if thermal_mask is not None:
-        num_axes += num_layer
+
 
     nrows = 4
     ncols = math.ceil(num_axes/nrows)
@@ -253,32 +242,6 @@ def save_intermediate_floorplan(path:str, curr_block:Block, canvas:torch.Tensor,
         axes_idx += 1
         binary_alignment_mask = torch.rot90(binary_alignment_mask, -1)
 
-    # draw adjacent terminal mask
-    if adjacent_terminal_mask is not None:
-        adjacent_terminal_mask = torch.rot90(adjacent_terminal_mask, 1)
-        x_max, y_max = adjacent_terminal_mask.shape
-        plt.colorbar(axes[axes_idx].imshow(adjacent_terminal_mask, extent=[0, x_max, 0, y_max], interpolation='none'), ax=axes[axes_idx])
-        axes[axes_idx].set_title(f"adjacent_terminal_mask, layer={curr_block.grid_z}\nfull_idx={curr_block.idx}, movable_idx={curr_block.movable_idx}\nadjacent_terminals={[t.idx for t in curr_block.adjacent_terminals]}")
-        axes_idx += 1
-        adjacent_terminal_mask = torch.rot90(adjacent_terminal_mask, -1)
-
-    # draw adjacent block mask
-    if adjacent_block_mask is not None:
-        adjacent_block_mask = torch.rot90(adjacent_block_mask, 1)
-        x_max, y_max = adjacent_block_mask.shape
-        plt.colorbar(axes[axes_idx].imshow(adjacent_block_mask, extent=[0, x_max, 0, y_max], interpolation='none'), ax=axes[axes_idx])
-        axes[axes_idx].set_title(f"adjacent_block_mask, layer={curr_block.grid_z}\nfull_idx={curr_block.idx}, movable_idx={curr_block.movable_idx}\nadjacent_blocks={curr_block.adjacent_blocks}")
-        axes_idx += 1
-        adjacent_block_mask = torch.rot90(adjacent_block_mask, -1)
-
-    # draw binary adjacent block mask
-    if binary_adjacent_block_mask is not None:
-        binary_adjacent_block_mask = torch.rot90(binary_adjacent_block_mask, 1)
-        x_max, y_max = binary_adjacent_block_mask.shape
-        plt.colorbar(axes[axes_idx].imshow(binary_adjacent_block_mask, extent=[0, x_max, 0, y_max], interpolation='none'), ax=axes[axes_idx])
-        axes[axes_idx].set_title(f"binary_adjacent_block_mask, layer={curr_block.grid_z}\nfull_idx={curr_block.idx}, movable_idx={curr_block.movable_idx}\nadjacent_blocks={curr_block.adjacent_blocks}")
-        axes_idx += 1
-        binary_adjacent_block_mask = torch.rot90(binary_adjacent_block_mask, -1)
     
     # draw available mask
     if len(masks_for_available_mask) > 0:
@@ -289,30 +252,7 @@ def save_intermediate_floorplan(path:str, curr_block:Block, canvas:torch.Tensor,
         axes[axes_idx].set_title(f"available_mask, layer={curr_block.grid_z}\nfull_idx={curr_block.idx}, movable_idx={curr_block.movable_idx}")
         axes_idx += 1
         available_mask = torch.rot90(available_mask, -1)
-    
-    # draw power mask
-    if power_mask is not None:
-        for z in range(num_layer):
-            power_mask_z = power_mask[z]
-            power_mask_z = torch.rot90(power_mask_z, 1)
-            x_max, y_max = power_mask_z.shape
-            plt.colorbar(axes[axes_idx].imshow(power_mask_z, extent=[0, x_max, 0, y_max], interpolation='none'), ax=axes[axes_idx])
-            axes[axes_idx].set_title(f"power_mask, layer={z}")
-            axes_idx += 1
-            power_mask_z = torch.rot90(power_mask_z, -1)
 
-    # draw thermal mask
-    if thermal_mask is not None:
-        for z in range(num_layer):
-            thermal_mask_z = thermal_mask[z]
-            thermal_mask_z = torch.rot90(thermal_mask_z, 1)
-            x_max, y_max = thermal_mask_z.shape
-            plt.colorbar(axes[axes_idx].imshow(thermal_mask_z, extent=[0, x_max, 0, y_max], interpolation='none'), ax=axes[axes_idx])
-            t_max = thermal_mask_z.max().item()
-            t_avg = thermal_mask_z.mean().item()
-            axes[axes_idx].set_title(f"thermal_mask, layer={z}\nmax={t_max:.2f}, avg={t_avg:.2f}")
-            axes_idx += 1
-            thermal_mask_z = torch.rot90(thermal_mask_z, -1)
     
 
     super_title = f"name = {curr_block.name}, layer = {curr_block.grid_z} \n full_idx = {curr_block.idx}, movable_idx = {curr_block.movable_idx} \n partner_indices = {curr_block.partner_indices}, adjacent_blocks = {curr_block.adjacent_blocks}, adjacent_terminals = {[t.idx for t in curr_block.adjacent_terminals]}"

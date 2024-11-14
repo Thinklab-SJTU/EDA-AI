@@ -47,8 +47,6 @@ class Critic(nn.Module):
             len_episode:int, shared_encoder:SharedEncoder, norm_wiremask:bool, 
             input_partner_die:bool, input_alignment_mask:bool, input_next_block:int, 
             num_die:int, input_sequence_critic:str, input_die_critic:bool, reduced_dim_critic:int, set_vision_to_zero:int, set_canvas_to_zero:int,
-            input_adjacent_terminal_mask:bool, input_adjacent_block_mask:bool,
-            input_thermal_mask:bool, input_power_mask:bool, 
         ):
         super().__init__()
         self.register_buffer("redundancy", torch.tensor(0.0))
@@ -61,10 +59,6 @@ class Critic(nn.Module):
         self.reduced_dim_critic = reduced_dim_critic
         self.set_vision_to_zero = set_vision_to_zero
         self.set_canvas_to_zero = set_canvas_to_zero
-        self.input_adjacent_terminal_mask = input_adjacent_terminal_mask
-        self.input_adjacent_block_mask = input_adjacent_block_mask
-        self.input_thermal_mask = input_thermal_mask
-        self.input_power_mask = input_power_mask
 
         final_input_dim = 0
 
@@ -154,22 +148,6 @@ class Critic(nn.Module):
         if self.input_alignment_mask:
             alignment_mask = obs["alignment_mask"].to(device) # [B, H, W]
             stacked_mask = torch.cat([stacked_mask, alignment_mask.unsqueeze(1)], dim=1)
-
-        if self.input_adjacent_terminal_mask:
-            adjacent_terminal_mask = obs["adjacent_terminal_mask"].to(device) # [B, H, W]
-            stacked_mask = torch.cat([stacked_mask, adjacent_terminal_mask.unsqueeze(1)], dim=1)
-
-        if self.input_adjacent_block_mask:
-            adjacent_block_mask = obs["adjacent_block_mask"].to(device)
-            stacked_mask = torch.cat([stacked_mask, adjacent_block_mask.unsqueeze(1)], dim=1)
-
-        if self.input_thermal_mask:
-            thermal_mask = obs["thermal_mask"].to(device) # [B, D, H, W]
-            stacked_mask = torch.cat([stacked_mask, thermal_mask], dim=1)
-
-        if self.input_power_mask:
-            power_mask = obs["power_mask"].to(device) # [B, D, H, W]
-            stacked_mask = torch.cat([stacked_mask, power_mask], dim=1)
             
             
         # set vision to zero, for ablation study

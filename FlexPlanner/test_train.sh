@@ -12,8 +12,8 @@ num_layer=2
 add_virtual_block=1
 
 
-circuit=n100
-max_epoch=2000
+circuit=n50
+max_epoch=1000
 area_util=1.6
 num_grid=128
 train=1
@@ -23,7 +23,7 @@ batch_size=64
 
 # alignment settings
 enable_alignment=1
-num_alignment=30
+num_alignment=10
 alignment_rate=0.1
 alignment_sort=area
 # alignment_sort=divice
@@ -32,12 +32,10 @@ use_alignment_constraint=1
 reward_weight_alignment=0.5
 
 
-
-
 shared_encoder_cls=SharedEncoder
 # shared_encoder_cls=ViT
 
-graph=1
+graph=0
 
 reward_func=5
 reward_weight_hpwl=1.0
@@ -112,7 +110,7 @@ fi
 
 
 # result_dir=result/${circuit}-n_aln=${num_alignment}-area=${area_util}/async=${async_place}
-result_dir=result/${circuit}
+result_dir=result/${circuit}-graph=${graph}-async_place=${async_place}
 
 
 # if have defined the variable `checkpoint`, add more comment to the `result_dir`

@@ -56,12 +56,10 @@ os.system(f"touch {os.path.join(result_dir, hostname)}")
 writer = TensorboardWriter(log_dir=result_dir)
 
 # fp_info
-fp_info, df_partner, df_adjacent_terminal, df_adjacent_block = circuit_dataloader.construct_fp_info_func(args.circuit, args.area_util, num_grid_x, num_grid_y, 
+fp_info, df_partner = circuit_dataloader.construct_fp_info_func(args.circuit, args.area_util, num_grid_x, num_grid_y, 
                                                     args.num_alignment, args.alignment_rate, args.alignment_sort, args.num_preplaced_module, args.add_virtual_block, args.num_layer)
 episode_len = fp_info.movable_block_num
 df_partner.to_csv(os.path.join(result_dir, "partner.csv"), index=False)
-df_adjacent_terminal.to_csv(os.path.join(result_dir, "adjacent_terminal.csv"), index=False)
-df_adjacent_block.to_csv(os.path.join(result_dir, "adjacent_block.csv"), index=False)
 
 # construct shared_encoder
 shared_encoder_input_channel = 3 # canvas, wiremask, position mask
@@ -69,14 +67,6 @@ if args.input_partner_die:
     shared_encoder_input_channel += (args.num_layer - 1)
 if args.input_alignment_mask:
     shared_encoder_input_channel += 1
-if args.input_adjacent_terminal_mask == 1:
-    shared_encoder_input_channel += 1
-if args.input_adjacent_block_mask == 1:
-    shared_encoder_input_channel += 1
-if args.input_thermal_mask:
-    shared_encoder_input_channel += args.num_layer
-if args.input_power_mask:
-    shared_encoder_input_channel += args.num_layer
 
 # one more block one the same layer
 if args.input_next_block == 0:
@@ -149,16 +139,11 @@ actor = model.Actor(
     wiremask_bbo=wiremask_bbo, ratio_decider=ratio_decider, norm_wiremask=args.norm_wiremask, 
     input_partner_die=args.input_partner_die, input_alignment_mask=args.input_alignment_mask, input_next_block=args.input_next_block, use_ready_layers_mask=False, 
     use_alignment_constraint=args.use_alignment_constraint, set_vision_to_zero=args.set_vision_to_zero, set_canvas_to_zero=args.set_canvas_to_zero, 
-    input_adjacent_terminal_mask=args.input_adjacent_terminal_mask, input_adjacent_block_mask=args.input_adjacent_block_mask, 
-    use_adjacent_terminal_constraint=args.use_adjacent_terminal_constraint, use_adjacent_block_constraint=args.use_adjacent_block_constraint,
-    input_thermal_mask=args.input_thermal_mask, input_power_mask=args.input_power_mask, 
 )
 
 critic = model.Critic(
     episode_len, shared_encoder, args.norm_wiremask, args.input_partner_die, args.input_alignment_mask, 
     args.input_next_block, fp_info.num_layer, args.input_sequence_critic, args.input_die_critic, args.reduced_dim_critic, args.set_vision_to_zero, args.set_canvas_to_zero, 
-    args.input_adjacent_terminal_mask, args.input_adjacent_block_mask,
-    args.input_thermal_mask, args.input_power_mask, 
 )
 
 
@@ -206,22 +191,19 @@ print(f"[INFO] critic has {sum(p.numel() for p in critic.parameters())} paramete
 
 # args for reward function
 reward_args = fp_env.RewardArgs(args.reward_func, args.reward_weight_hpwl, args.reward_weight_overlap, args.reward_weight_alignment, args.reward_weight_final_hpwl, 
-                                args.reward_weight_adjacent_terminal, args.reward_weight_adjacent_block, args.reward_class_adjacent_block, args.reward_weight_thermal)
+                                )
 
 
 # collect statistics for normalization
 need_sequence_feature = args.async_place_input_sequence is not None or args.input_sequence_critic
 need_alignment_mask = args.input_alignment_mask or args.use_alignment_constraint
-need_adjacent_terminal_mask = args.input_adjacent_terminal_mask or args.use_adjacent_terminal_constraint
-need_adjacent_block_mask = args.input_adjacent_block_mask or args.use_adjacent_block_constraint
 single_env = fp_env.PlaceEnv(
     fp_info, args.overlap_ratio, args.along_boundary, reward_args, 
     args.ratio_range, args.async_place, device,
     args.place_order_die_by_die, args.input_next_block,
     args.place_order_sorting_method,
-    args.graph, args.input_layer_sequence, need_sequence_feature, args.merge_adjacent_block_mask,
-    need_alignment_mask, need_adjacent_terminal_mask, need_adjacent_block_mask, 
-    args.enable_thermal, args.ambient_temperture,
+    args.graph, args.input_layer_sequence, need_sequence_feature,
+    need_alignment_mask,
 )
 
 single_env.reset()
@@ -340,11 +322,6 @@ for iter_idx in tqdm(range(episode_len)):
             obs["wiremask"][env_idx], 
             obs["alignment_mask"][env_idx] if "alignment_mask" in obs.keys() else None,
             obs["binary_alignment_mask"][env_idx] if "binary_alignment_mask" in obs.keys() else None,
-            obs["adjacent_terminal_mask"][env_idx] if "adjacent_terminal_mask" in obs.keys() else None,
-            obs["adjacent_block_mask"][env_idx] if "adjacent_block_mask" in obs.keys() else None,
-            obs["binary_adjacent_block_mask"][env_idx] if "binary_adjacent_block_mask" in obs.keys() else None,
-            obs["power_mask"][env_idx] if "power_mask" in obs.keys() else None,
-            obs["thermal_mask"][env_idx] if "thermal_mask" in obs.keys() else None,
             fp_info,
         )
 

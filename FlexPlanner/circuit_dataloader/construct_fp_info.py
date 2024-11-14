@@ -1,8 +1,6 @@
 from .parser import parse_blk_tml, map_tml, parse_net
 from .construct_partner import construct_partner_blk
 from .construct_layer import assign_layer
-from .construct_adjacent_terminal import construct_block_adjacent_terminal
-from .construct_adjacent_block import construct_block_adjacent_block
 from .construct_pre_placed_module import construct_preplaced_modules
 import torch
 import fp_env
@@ -11,7 +9,6 @@ from typing import Tuple
 from copy import deepcopy
 from collections import defaultdict
 
-debug_circuits = ["cpu"]
 
 def construct_fp_info_func(circuit:str, area_util:float, num_grid_x:int, num_grid_y:int, num_alignment:int, 
                            alignment_rate:float, alignment_sort:str, num_preplaced_module:int, add_virtual_block:bool, num_layer:int) -> Tuple[fp_env.FPInfo, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
@@ -102,7 +99,7 @@ def construct_fp_info_func(circuit:str, area_util:float, num_grid_x:int, num_gri
 
     # construct alignment partner, and set to fp_info
     fp_info.set_alignment_sort(alignment_sort)
-    df_partner = construct_partner_blk(fp_info, num_alignment, alignment_sort) if circuit not in debug_circuits else pd.read_csv(f"data/{circuit}.aln.csv")
+    df_partner = construct_partner_blk(fp_info, num_alignment, alignment_sort)
     for row in df_partner.itertuples():
         blk0_name, blk1_name = row.blk0, row.blk1
         blk0, blk1 = name2obj[blk0_name], name2obj[blk1_name]
@@ -115,20 +112,4 @@ def construct_fp_info_func(circuit:str, area_util:float, num_grid_x:int, num_gri
     df_partner.sort_values(by=['alignment_group', 'blk0', 'blk1'], inplace=True)
     df_partner["alignment_group"] = df_partner["alignment_group"].astype(int)
 
-
-    # construct block adjacent to terminal
-    df_adjacent_terminal = construct_block_adjacent_terminal(fp_info) if circuit not in debug_circuits else pd.read_csv(f"data/{circuit}.blk_adj_tml.csv")
-    for row in df_adjacent_terminal.itertuples():
-        blk, tml = row.blk, row.tml
-        blk_idx, tml_idx = name2obj[blk].idx, name2obj[tml].idx
-        fp_info.set_adjacent_terminal(blk_idx, tml_idx)
-
-    
-    # construct block adjacent to block
-    df_adjacent_block = construct_block_adjacent_block(fp_info) if circuit not in debug_circuits else pd.read_csv(f"data/{circuit}.blk_adj_blk.csv")
-    for row in df_adjacent_block.itertuples():
-        blk0, blk1 = row.blk0, row.blk1
-        blk0_idx, blk1_idx = name2obj[blk0].idx, name2obj[blk1].idx
-        fp_info.set_adjacent_block(blk0_idx, blk1_idx)
-
-    return fp_info, df_partner, df_adjacent_terminal, df_adjacent_block
+    return fp_info, df_partner

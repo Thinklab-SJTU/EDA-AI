@@ -46,8 +46,6 @@ class Actor(nn.Module):
             deconv_class:type[InfoGANGenerator], layer_decider:LayerDecider,
             wiremask_bbo:bool, norm_wiremask:bool, input_partner_die:bool, input_alignment_mask:bool, 
             input_next_block:int, use_ready_layers_mask:bool, use_alignment_constraint:bool, set_vision_to_zero:int, set_canvas_to_zero:int,
-            input_adjacent_terminal_mask:bool, input_adjacent_block_mask:bool, use_adjacent_terminal_constraint:bool, use_adjacent_block_constraint:bool,
-            input_thermal_mask:bool, input_power_mask:bool,
         ) -> None:
         super().__init__()
         n_grid = int(num_act ** 0.5)
@@ -72,13 +70,6 @@ class Actor(nn.Module):
         self.use_alignment_constraint = use_alignment_constraint
         self.set_vision_to_zero = set_vision_to_zero
         self.set_canvas_to_zero = set_canvas_to_zero
-        self.input_adjacent_terminal_mask = input_adjacent_terminal_mask
-        self.input_adjacent_block_mask = input_adjacent_block_mask
-        self.use_adjacent_terminal_constraint = use_adjacent_terminal_constraint
-        self.use_adjacent_block_constraint = use_adjacent_block_constraint
-        self.input_thermal_mask = input_thermal_mask
-        self.input_power_mask = input_power_mask
-
 
 
     def get_device(self) -> torch.device:
@@ -127,22 +118,6 @@ class Actor(nn.Module):
             if self.input_alignment_mask:
                 alignment_mask = obs["alignment_mask"].to(device) # [B, H, W]
                 stacked_mask = torch.cat([stacked_mask, alignment_mask.unsqueeze(1)], dim=1) # [B, C+1, H, W]
-
-            if self.input_adjacent_terminal_mask:
-                adjacent_terminal_mask = obs["adjacent_terminal_mask"].to(device) # [B, H, W]
-                stacked_mask = torch.cat([stacked_mask, adjacent_terminal_mask.unsqueeze(1)], dim=1) # [B, C+3, H, W]
-
-            if self.input_adjacent_block_mask:
-                adjacent_block_mask = obs["adjacent_block_mask"].to(device)
-                stacked_mask = torch.cat([stacked_mask, adjacent_block_mask.unsqueeze(1)], dim=1) # [B, C+4, H, W]
-
-            if self.input_thermal_mask:
-                thermal_mask = obs["thermal_mask"].to(device) # [B, D, H, W]
-                stacked_mask = torch.cat([stacked_mask, thermal_mask], dim=1)
-            
-            if self.input_power_mask:
-                power_mask = obs["power_mask"].to(device) # [B, D, H, W]
-                stacked_mask = torch.cat([stacked_mask, power_mask], dim=1)
 
             assert stacked_mask.shape[1] == self.shared_encoder.input_channels, f"stacked_mask.shape[1] = {stacked_mask.shape[1]}, self.shared_encoder.input_channels = {self.shared_encoder.input_channels}"
 
@@ -200,18 +175,16 @@ class Actor(nn.Module):
         # available_mask to decide final available position
         binary_alignment_mask = obs["binary_alignment_mask"].to(device) if self.use_alignment_constraint else torch.zeros_like(position_mask) # [B, H, W]
         position_mask_loose = obs["position_mask_loose"].to(device) # [B, H, W]
-        adjacent_terminal_mask = obs["adjacent_terminal_mask"].to(device) if self.use_adjacent_terminal_constraint else torch.zeros_like(position_mask) # [B, H, W]
-        binary_adjacent_block_mask = obs["binary_adjacent_block_mask"].to(device) if self.use_adjacent_block_constraint else torch.zeros_like(position_mask) # [B, H, W]
         boundary_mask = obs["boundary_mask"].to(device) # [B, H, W]
 
         # only 0+0 == 0
-        available_mask = position_mask + binary_alignment_mask + adjacent_terminal_mask + binary_adjacent_block_mask
+        available_mask = position_mask + binary_alignment_mask
 
         # drop adjacent block mask constraint
         num_avail_pos = (available_mask == 0).sum(dim=(1,2))
         no_avail_pos = torch.where(num_avail_pos == 0)[0]
         if len(no_avail_pos) > 0:
-            available_mask[no_avail_pos] = (position_mask + binary_alignment_mask + adjacent_terminal_mask)[no_avail_pos]
+            available_mask[no_avail_pos] = (position_mask + binary_alignment_mask)[no_avail_pos]
 
         # drop adjacent terminal mask constraint
         num_avail_pos = (available_mask == 0).sum(dim=(1,2)) # [B]

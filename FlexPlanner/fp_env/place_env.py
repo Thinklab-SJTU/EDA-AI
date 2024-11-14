@@ -25,16 +25,12 @@ class RewardArgs:
     def __init__(self, 
                  reward_func:int,
                  reward_weight_hpwl:float, reward_weight_overlap:float, reward_weight_alignment:float, reward_weight_final_hpwl:float, 
-                 reward_weight_adjacent_terminal:float, reward_weight_adjacent_block:float, reward_class_adjacent_block:int, reward_weight_thermal:float):
+                 ):
         self.reward_func = reward_func
         self.reward_weight_hpwl = reward_weight_hpwl
         self.reward_weight_overlap = reward_weight_overlap
         self.reward_weight_alignment = reward_weight_alignment
         self.reward_weight_final_hpwl = reward_weight_final_hpwl
-        self.reward_weight_adjacent_terminal = reward_weight_adjacent_terminal
-        self.reward_weight_adjacent_block = reward_weight_adjacent_block
-        self.reward_class_adjacent_block = reward_class_adjacent_block
-        self.reward_weight_thermal = reward_weight_thermal
 
     
     def __repr__(self) -> str:
@@ -51,9 +47,8 @@ class PlaceEnv(gym.Env):
                  ratio_range:list[float,float], async_place:bool, 
                  device:torch.device, place_order_die_by_die:bool, input_next_block:int,
                  place_order_sorting_method:str,
-                 graph:int, input_layer_sequence:bool, need_sequence_feature:bool, merge_adjacent_block_mask:str,
-                 need_alignment_mask:bool, need_adjacent_terminal_mask:bool, need_adjacent_block_mask:bool,
-                 enable_thermal:bool, ambient_temperture:float,
+                 graph:int, input_layer_sequence:bool, need_sequence_feature:bool,
+                 need_alignment_mask:bool,
                  ):
         """
         Environment for floorplan.
@@ -74,14 +69,8 @@ class PlaceEnv(gym.Env):
         self.graph = graph
         self.input_layer_sequence = input_layer_sequence
         self.need_sequence_feature = need_sequence_feature
-        self.reward_class_adjacent_block = reward_args.reward_class_adjacent_block
-        self.merge_adjacent_block_mask = merge_adjacent_block_mask
         self.empty_mask = torch.zeros((self.fp_info.x_grid_num, self.fp_info.y_grid_num)).to(device=self.return_device)
         self.need_alignment_mask = need_alignment_mask
-        self.need_adjacent_terminal_mask = need_adjacent_terminal_mask
-        self.need_adjacent_block_mask = need_adjacent_block_mask
-        self.enable_thermal = enable_thermal
-        self.ambient_temperture = ambient_temperture
 
         # define action space and observation space
         action_space = OrderedDict({"pos": gym.spaces.Discrete(fp_info.x_grid_num * fp_info.y_grid_num)})
@@ -97,10 +86,6 @@ class PlaceEnv(gym.Env):
         self.reward_args = reward_args
         assert reward_args is not None, "[Error] reward_args is None."
         print(f"[INFO] reward_args: \n{self.reward_args}")
-
-        # set thermal conv
-        if enable_thermal:
-            self.fp_info.construct_thermal_conv(self.ambient_temperture, device=self.device)
 
     
     def reset(self) -> Tuple[Dict, Dict]:
@@ -156,15 +141,6 @@ class PlaceEnv(gym.Env):
         if self.need_alignment_mask:
             alignment_mask, binary_alignment_mask = self.get_alignment_mask(next_block, self.device)
 
-        if self.need_adjacent_terminal_mask:
-            adjacent_terminal_mask = self.get_adjacent_terminal_mask(next_block, self.device)
-        
-        if self.need_adjacent_block_mask:
-            adjacent_block_mask, binary_adjacent_block_mask = self.get_adjacent_block_mask(next_block, self.device)
-
-        if self.enable_thermal:
-            power_mask = self.fp_info.get_power_mask()
-            thermal_mask = self.fp_info.get_thermal_mask(power_mask)
 
         state = {
             "step": self.fp_info.placed_movable_block_num,
@@ -194,20 +170,7 @@ class PlaceEnv(gym.Env):
         if self.need_alignment_mask:
             state["alignment_mask"] = alignment_mask.to(device=self.return_device)
             state["binary_alignment_mask"] = binary_alignment_mask.to(device=self.return_device)
-
-        # adjacent terminal mask
-        if self.need_adjacent_terminal_mask:
-            state["adjacent_terminal_mask"] = adjacent_terminal_mask.to(device=self.return_device)
-
-        # need_adjacent_block_mask
-        if self.need_adjacent_block_mask:
-            state["adjacent_block_mask"] = adjacent_block_mask.to(device=self.return_device)
-            state["binary_adjacent_block_mask"] = binary_adjacent_block_mask.to(device=self.return_device)
-        
-        # thermal mask
-        if self.enable_thermal:
-            state["power_mask"] = power_mask.to(device=self.return_device)
-            state["thermal_mask"] = thermal_mask.to(device=self.return_device)
+    
 
         # input_layer_sequence
         if self.input_layer_sequence:
@@ -256,15 +219,10 @@ class PlaceEnv(gym.Env):
         terminated = self.fp_info.is_all_placed()
         truncated = False
 
-        # thermal
-        if self.enable_thermal:
-            power_mask = self.fp_info.get_power_mask()
-            thermal_mask = self.fp_info.get_thermal_mask(power_mask)
 
         # calculate reward
         action_z = action["layer"] if self.async_place else curr_blk.grid_z
-        tm = thermal_mask if self.enable_thermal else None
-        reward, info = self.calc_reward(terminated, x, y, action_z, self.fp_info.placed_movable_block_num, tm)
+        reward, info = self.calc_reward(terminated, x, y, action_z, self.fp_info.placed_movable_block_num, None)
 
 
         # layer_curr_blk, which is the layer to access next block
@@ -308,22 +266,10 @@ class PlaceEnv(gym.Env):
             if self.need_alignment_mask:
                 alignment_mask, binary_alignment_mask = self.get_alignment_mask(next_block, self.device)
 
-            if self.need_adjacent_terminal_mask:
-                adjacent_terminal_mask = self.get_adjacent_terminal_mask(next_block, self.device)
-            
-            if self.need_adjacent_block_mask:
-                adjacent_block_mask, binary_adjacent_block_mask = self.get_adjacent_block_mask(next_block, self.device)
         else:
             if self.need_alignment_mask:
                 alignment_mask = self.empty_mask.clone()
                 binary_alignment_mask = self.empty_mask.clone().to(dtype=torch.int32)
-
-            if self.need_adjacent_terminal_mask:
-                adjacent_terminal_mask = self.empty_mask.clone().to(dtype=torch.int32)
-
-            if self.need_adjacent_block_mask:
-                adjacent_block_mask = self.empty_mask.clone().to(dtype=torch.int32)
-                binary_adjacent_block_mask = self.empty_mask.clone().to(dtype=torch.int32)
 
         obs_next = {
             "step": self.fp_info.placed_movable_block_num,
@@ -353,25 +299,12 @@ class PlaceEnv(gym.Env):
             obs_next["alignment_mask"] = alignment_mask.to(device=self.return_device)
             obs_next["binary_alignment_mask"] = binary_alignment_mask.to(device=self.return_device)
 
-        # adjacent terminal mask
-        if self.need_adjacent_terminal_mask:
-            obs_next["adjacent_terminal_mask"] = adjacent_terminal_mask.to(device=self.return_device)
-
-        # need_adjacent_block_mask
-        if self.need_adjacent_block_mask:
-            obs_next["adjacent_block_mask"] = adjacent_block_mask.to(device=self.return_device)
-            obs_next["binary_adjacent_block_mask"] = binary_adjacent_block_mask.to(device=self.return_device)
 
         # input_layer_sequence
         if self.input_layer_sequence:
             obs_next["layer_sequence"] = self.layer_sequence
             obs_next["layer_sequence_mask"] = self.layer_sequence_mask
             obs_next["layer_sequence_len"] = self.layer_sequence_len
-        
-        # thermal mask
-        if self.enable_thermal:
-            obs_next["power_mask"] = power_mask.to(device=self.return_device)
-            obs_next["thermal_mask"] = thermal_mask.to(device=self.return_device)
         
         # sequence feature
         if self.need_sequence_feature:
@@ -829,71 +762,11 @@ class PlaceEnv(gym.Env):
         # overlap
         overlap = self.fp_info.get_overlap() # the lower the better
 
-        # distance adjacent to terminal
-        if self.reward_args.reward_weight_adjacent_terminal is not None:
-            distance_adjacent_terminal = self.fp_info.get_distance_adjacent_terminal() # the lower the better
-
-        # reward for adjacent block
-        if self.reward_args.reward_weight_adjacent_block is not None:
-            blk_adj_len, blk_adj_rew = self.fp_info.calc_reward_adjacent_block(self.reward_class_adjacent_block)
-
-        # temperature
-        if self.reward_args.reward_weight_thermal is not None:
-            max_temp, mean_temp = self.fp_info.calc_temperature(tm)
-            reward_thermal = self.fp_info.calc_temperature_reward(max_temp, mean_temp)
-
         # number of residual blocks in layer z
         num_residual_blk = self.num_block_without_placing_order[action_z]
         
-        # use 1) alignment, 2) overlap, 3) difference of hpwl, 4) if final step, subtract final hpwl
-        if self.reward_func in [0,2]:
-            reward = self.reward_args.reward_weight_hpwl * hpwl_delta \
-                -1 * self.reward_args.reward_weight_overlap * overlap
-            
-            # some optional rewards, alignment, adjacent terminal, adjacent block
-            if self.reward_args.reward_weight_alignment is not None:
-                reward += self.reward_args.reward_weight_alignment * alignment_score
-
-            if self.reward_args.reward_weight_adjacent_terminal is not None:
-                reward -= self.reward_args.reward_weight_adjacent_terminal * distance_adjacent_terminal
-            
-            if self.reward_args.reward_weight_adjacent_block is not None:
-                reward += self.reward_args.reward_weight_adjacent_block * blk_adj_rew
-
-            if self.reward_args.reward_weight_thermal is not None:
-                reward += self.reward_args.reward_weight_thermal * reward_thermal
-
-            # final step, subtract final hpwl
-            if terminated:
-                reward -= self.reward_args.reward_weight_final_hpwl * weight_hpwl / hpwl_norm_coef
-
-            # reward 2, penalize if no residual block
-            if self.reward_func == 2:
-                if num_residual_blk <= 0 and not terminated:
-                    reward -= 1
-
-        elif self.reward_func in [1, 3]:
-            raise NotImplementedError(f"[Error] reward_func: {self.reward_func} is not supported.")
-
-        elif self.reward_func == 4: # sparse reward for hpwl, overlap and alignment. GraphPlace and DeepPlace.
-            reward = 0.0
-            if terminated:
-                reward -= self.reward_args.reward_weight_final_hpwl * weight_hpwl / hpwl_norm_coef
-                reward -= self.reward_args.reward_weight_overlap * overlap
-
-                if self.reward_args.reward_weight_alignment is not None:
-                    reward += self.reward_args.reward_weight_alignment * alignment_score
-                
-                if self.reward_args.reward_weight_adjacent_terminal is not None:
-                    reward -= self.reward_args.reward_weight_adjacent_terminal * distance_adjacent_terminal
-                
-                if self.reward_args.reward_weight_adjacent_block is not None:
-                    reward += self.reward_args.reward_weight_adjacent_block * blk_adj_rew
-
-                if self.reward_args.reward_weight_thermal is not None:
-                    reward += self.reward_args.reward_weight_thermal * reward_thermal
                     
-        elif self.reward_func == 5: # Intermediate step, use difference of metrics. Final step, use final metrics. Recompute reward.
+        if self.reward_func == 5: # Intermediate step, use difference of metrics. Final step, use final metrics. Recompute reward.
             if not terminated:
                 last_weight_hpwl = self.last_metrics["weight_hpwl"]
                 last_overlap = self.last_metrics["overlap"]
@@ -904,18 +777,7 @@ class PlaceEnv(gym.Env):
                 if self.reward_args.reward_weight_alignment is not None:
                     last_alignment_score = self.last_metrics["alignment"]
                     reward += self.reward_args.reward_weight_alignment * (alignment_score - last_alignment_score)
-                
-                if self.reward_args.reward_weight_adjacent_terminal is not None:
-                    last_distance_adjacent_terminal = self.last_metrics["distance_adjacent_terminal"]
-                    reward += self.reward_args.reward_weight_adjacent_terminal * (last_distance_adjacent_terminal - distance_adjacent_terminal)
-                
-                if self.reward_args.reward_weight_adjacent_block is not None:
-                    last_blk_adj_rew = self.last_metrics["blk_adj_rew"]
-                    reward += self.reward_args.reward_weight_adjacent_block * (blk_adj_rew - last_blk_adj_rew)
-
-                if self.reward_args.reward_weight_thermal is not None:
-                    last_reward_thermal = self.last_metrics["reward_thermal"]
-                    reward += self.reward_args.reward_weight_thermal * (reward_thermal - last_reward_thermal)
+            
 
             else:
                 reward = 0.0
@@ -925,14 +787,6 @@ class PlaceEnv(gym.Env):
                 if self.reward_args.reward_weight_alignment is not None:
                     reward += self.reward_args.reward_weight_alignment * alignment_score
                 
-                if self.reward_args.reward_weight_adjacent_terminal is not None:
-                    reward -= self.reward_args.reward_weight_adjacent_terminal * distance_adjacent_terminal
-                
-                if self.reward_args.reward_weight_adjacent_block is not None:
-                    reward += self.reward_args.reward_weight_adjacent_block * blk_adj_rew
-
-                if self.reward_args.reward_weight_thermal is not None:
-                    reward += self.reward_args.reward_weight_thermal * reward_thermal
 
         else:
             raise NotImplementedError(f"[Error] reward_func: {self.reward_func} is not supported.")
@@ -955,13 +809,13 @@ class PlaceEnv(gym.Env):
             "original_hpwl": original_hpwl,
             "overlap": overlap,
             "alignment": alignment_score if self.reward_args.reward_weight_alignment is not None else -1.0,
-            "distance_adjacent_terminal": distance_adjacent_terminal if self.reward_args.reward_weight_adjacent_terminal is not None else -1.0,
-            "blk_adj_len": blk_adj_len if self.reward_args.reward_weight_adjacent_block is not None else -1.0,
-            "blk_adj_rew": blk_adj_rew if self.reward_args.reward_weight_adjacent_block is not None else -1.0,
+            "distance_adjacent_terminal": -1.0,
+            "blk_adj_len":  -1.0,
+            "blk_adj_rew":  -1.0,
 
-            "reward_thermal": reward_thermal if self.reward_args.reward_weight_thermal is not None else -1.0,
-            "max_temp": max_temp if self.reward_args.reward_weight_thermal is not None else -1.0,
-            "mean_temp": mean_temp if self.reward_args.reward_weight_thermal is not None else -1.0,
+            "reward_thermal": -1.0,
+            "max_temp":  -1.0,
+            "mean_temp": -1.0,
 
             "layer_sum_first_half_seq": layer_sum_first_half_seq,
             "next_layer_valid": next_layer_valid,
@@ -1256,160 +1110,4 @@ class PlaceEnv(gym.Env):
 
         return overlap_fast
 
-
-    @torch.no_grad()
-    def _get_adjacent_terminal_mask(self, block_to_place:Block, terminal:Terminal, device:torch.device) -> torch.IntTensor:
-        """
-        Return a mask with shape (x_grid_num, y_grid_num).
-        It is a binary mask.
-        0: (x,y) is adjacent to the terminal.
-        1: (x,y) is not adjacent to the terminal.
-        """
-        # all positions are invalid
-        mask = torch.ones((self.fp_info.x_grid_num, self.fp_info.y_grid_num), device=device, dtype=torch.int32)
-        x,y = terminal.grid_x, terminal.grid_y
-        w,h = block_to_place.grid_w, block_to_place.grid_h
-
-        y_min = max(0, y+1-h)
-        y_max = min(self.fp_info.y_grid_num-1, y)
-
-        x1 = x
-        x2 = x-w+1
-        if x1 < self.fp_info.x_grid_num:
-            mask[x1, y_min:y_max+1] = 0
-        if x2 >= 0:
-            mask[x2, y_min:y_max+1] = 0
-
-        x_min = max(0, x+1-w)
-        x_max = min(self.fp_info.x_grid_num-1, x)
-
-        y1 = y
-        y2 = y-h+1
-        if y1 < self.fp_info.y_grid_num:
-            mask[x_min:x_max+1, y1] = 0
-        if y2 >= 0:
-            mask[x_min:x_max+1, y2] = 0
-
-        return mask
     
-
-    def get_adjacent_terminal_mask(self, block_to_place:Block, device:torch.device=torch.device("cpu")) -> torch.IntTensor:
-        """
-        Return a mask with shape (x_grid_num, y_grid_num).
-        It is a binary mask.
-        0: (x,y) is adjacent to the terminal.
-        1: (x,y) is not adjacent to the terminal.
-        """
-        if block_to_place.adjacent_terminals.__len__() == 0:
-            mask = torch.zeros((self.fp_info.x_grid_num, self.fp_info.y_grid_num), dtype=torch.int32, device=device)
-        else:
-            mask = []
-            for terminal in block_to_place.adjacent_terminals:
-                mask.append(self._get_adjacent_terminal_mask(block_to_place, terminal, device=device))
-            mask = torch.stack(mask, dim=0).prod(dim=0).to(dtype=torch.int32) # 0 * X = 0
-        return mask
-    
-
-
-    @torch.no_grad()
-    def _get_adjacent_block_mask(self, block_to_place:Block, adjacent_block:Block, device:torch.device) -> torch.IntTensor:
-        """
-        Return a mask, indicate whether the block_to_place is adjacent to the adjacent_block.
-        Each element in this mask indicates the adjacent length between the block_to_place and the adjacent_block.
-        """
-        assert adjacent_block.placed, "[Error] The adjacent_block {} has not been placed.".format(adjacent_block.idx)
-        w1,h1 = block_to_place.grid_w, block_to_place.grid_h
-        w2,h2 = adjacent_block.grid_w, adjacent_block.grid_h
-        x2,y2 = adjacent_block.grid_x, adjacent_block.grid_y
-
-        
-        mask = torch.zeros((self.fp_info.x_grid_num, self.fp_info.y_grid_num), dtype=torch.int32, device=device)
-        
-        x1 = x2 - w1
-        # if blk is placed during this range, then it will be close to the partner block
-        y1_start = max(y2 - h1 + 1, 0) # closed
-        y1_end = min(y2 + h2, self.fp_info.y_grid_num) # open
-        if x1 >= 0:
-            left1 = torch.arange(y1_start, y1_end, device=device)
-            left2 = torch.full_like(left1, y2)
-            right1 = left1 + h1
-            right2 = left2 + h2
-            l = torch.where(left1>left2, left1, left2)
-            r = torch.where(right1<right2, right1, right2)
-            o = (r-l).clip(0)
-            mask[x1, y1_start:y1_end] = o
-
-        x1 = x2 + w2
-        y1_start = max(y2 - h1 + 1, 0)
-        y1_end = min(y2 + h2, self.fp_info.y_grid_num)
-        if x1 < self.fp_info.x_grid_num:
-            left1 = torch.arange(y1_start, y1_end, device=device)
-            left2 = torch.full_like(left1, y2)
-            right1 = left1 + h1
-            right2 = left2 + h2
-            l = torch.where(left1>left2, left1, left2)
-            r = torch.where(right1<right2, right1, right2)
-            o = (r-l).clip(0)
-            mask[x1, y1_start:y1_end] = o
-
-        y1 = y2 - h1
-        x1_start = max(x2 - w1 + 1, 0)
-        x1_end = min(x2 + w2, self.fp_info.x_grid_num)
-        if y1 >= 0:
-            left1 = torch.arange(x1_start, x1_end, device=device)
-            left2 = torch.full_like(left1, x2)
-            right1 = left1 + w1
-            right2 = left2 + w1
-            l = torch.where(left1>left2, left1, left2)
-            r = torch.where(right1<right2, right1, right2)
-            o = (r-l).clip(0)
-            mask[x1_start:x1_end, y1] = o
-
-        y1 = y2 + h2
-        x1_start = max(x2 - w1 + 1, 0)
-        x1_end = min(x2 + w2, self.fp_info.x_grid_num)
-        if y1 < self.fp_info.y_grid_num:
-            left1 = torch.arange(x1_start, x1_end, device=device)
-            left2 = torch.full_like(left1, x2)
-            right1 = left1 + w1
-            right2 = left2 + w1
-            l = torch.where(left1>left2, left1, left2)
-            r = torch.where(right1<right2, right1, right2)
-            o = (r-l).clip(0)
-            mask[x1_start:x1_end, y1] = o
-
-        return mask
-    
-    def get_adjacent_block_mask(self, block_to_place:Block, device:torch.device=torch.device("cpu")) -> tuple[torch.IntTensor, torch.IntTensor]:
-        """
-        Return adjacent block mask and binary adjacent block mask.
-        For the adjacent block mask, each element indicates the adjacent length between the block_to_place and the adjacent_block.
-        For the binary adjacent block mask, 0 means the position is valid, 1 means the position is invalid.
-        """
-        mask = []
-        bin_mask = []
-        for adj_blk_idx in block_to_place.adjacent_blocks:
-            adj_blk = self.fp_info.get_module_by_full_idx(adj_blk_idx)
-            if not adj_blk.placed:
-                continue
-            m = self._get_adjacent_block_mask(block_to_place, adj_blk, device=device)
-            bin_m = torch.where(m > 0, 0, 1).to(dtype=torch.int32, device=device)
-            mask.append(m)
-            bin_mask.append(bin_m)
-
-        # block_to_place does not have adjacent blocks, or none of the adjacent blocks are placed
-        if mask.__len__() == 0:
-            mask.append(torch.zeros((self.fp_info.x_grid_num, self.fp_info.y_grid_num), dtype=torch.int32, device=device))
-            bin_mask.append(torch.zeros((self.fp_info.x_grid_num, self.fp_info.y_grid_num), dtype=torch.int32, device=device))
-        
-        if self.merge_adjacent_block_mask == 'max':
-            mask = torch.stack(mask, dim=0).max(dim=0).values # union
-        elif self.merge_adjacent_block_mask == 'sum':
-            mask = torch.stack(mask, dim=0).sum(dim=0)
-        else:
-            raise NotImplementedError(f"[Error] merge_adjacent_block_mask: {self.merge_adjacent_block_mask} is not supported.")
-        
-        mask = mask.to(dtype=torch.int32, device=device)
-        bin_mask = torch.stack(bin_mask, dim=0).prod(dim=0).to(dtype=torch.int32, device=device) # 0 * X = 0
-
-        return mask, bin_mask

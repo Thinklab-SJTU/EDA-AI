@@ -46,27 +46,6 @@ def get_args():
     parser.add_argument('--use_alignment_constraint', type=int, default=1, help='whether use alignment mask to filter out invalid actions')
     parser.add_argument('--reward_weight_alignment', type=float, default=0.05, help='reward weight alignment')
 
-    # for adjacent terminal constraint
-    parser.add_argument('--enable_adjacent_terminal', type=int, default=0, help='enable adjacent terminal constraint')
-    parser.add_argument('--input_adjacent_terminal_mask', type=int, default=0, help='input adjacent terminal mask to AC')
-    parser.add_argument('--use_adjacent_terminal_constraint', type=int, default=0, help='whether use adjacent terminal mask to filter out invalid actions')
-    parser.add_argument('--reward_weight_adjacent_terminal', type=float, default=0.0, help='reward weight adjacent terminal')
-
-    # for adjacent block constraint
-    parser.add_argument('--enable_adjacent_block', type=int, default=0, help='enable adjacent block constraint')
-    parser.add_argument('--input_adjacent_block_mask', type=int, default=0, help='input adjacent block mask to AC')
-    parser.add_argument('--use_adjacent_block_constraint', type=int, default=0, help='whether use adjacent block mask to filter out invalid actions')
-    parser.add_argument('--merge_adjacent_block_mask', type=str, default='max', help='merge adjacent block mask method', choices=['max', 'sum'])
-    parser.add_argument('--reward_class_adjacent_block', type=int, default=0, help='reward adjacent class')
-    parser.add_argument('--reward_weight_adjacent_block', type=float, default=0.0, help='reward weight adjacent block')
-
-    # for thermal
-    parser.add_argument('--enable_thermal', type=int, default=0, help='enable thermal')
-    parser.add_argument('--input_thermal_mask', type=int, default=0, help='input thermal mask to AC')
-    parser.add_argument('--input_power_mask', type=int, default=0, help='input power mask to AC')
-    parser.add_argument('--reward_weight_thermal', type=float, default=0.0, help='reward weight thermal')
-    parser.add_argument('--ambient_temperture', type=float, default=318.15, help='ambient temperture')
-
 
     # for some ablation study
     parser.add_argument('--max_grad_norm', type=float, default=-1.0, help='max grad norm, < 0 means no grad norm')
@@ -155,39 +134,6 @@ def get_args():
     else:
         args.use_alignment_constraint = None
         args.input_alignment_mask = None
-
-    # override the default value for adjacent terminal
-    args.enable_adjacent_terminal = True if args.enable_adjacent_terminal > 0 else False
-    args.reward_weight_adjacent_terminal = args.reward_weight_adjacent_terminal if args.enable_adjacent_terminal else None
-    if args.enable_adjacent_terminal:
-        args.use_adjacent_terminal_constraint = True if args.use_adjacent_terminal_constraint > 0 else False
-        args.input_adjacent_terminal_mask = True if args.input_adjacent_terminal_mask > 0 else False
-    else:
-        args.use_adjacent_terminal_constraint = None
-        args.input_adjacent_terminal_mask = None
-
-    # override the default value for adjacent block
-    args.enable_adjacent_block = True if args.enable_adjacent_block > 0 else False
-    args.reward_class_adjacent_block = args.reward_class_adjacent_block if args.enable_adjacent_block else None
-    args.reward_weight_adjacent_block = args.reward_weight_adjacent_block if args.enable_adjacent_block else None
-    args.merge_adjacent_block_mask = args.merge_adjacent_block_mask if args.enable_adjacent_block else None
-    if args.enable_adjacent_block:
-        args.use_adjacent_block_constraint = True if args.use_adjacent_block_constraint > 0 else False
-        args.input_adjacent_block_mask = True if args.input_adjacent_block_mask > 0 else False
-    else:
-        args.use_adjacent_block_constraint = None
-        args.input_adjacent_block_mask = None
-
-    # override the default value for thermal
-    args.enable_thermal = True if args.enable_thermal > 0 else False
-    args.reward_weight_thermal = args.reward_weight_thermal if args.enable_thermal else None
-    args.ambient_temperture = args.ambient_temperture if args.enable_thermal else None
-    if args.enable_thermal:
-        args.input_thermal_mask = True if args.input_thermal_mask > 0 else False
-        args.input_power_mask = True if args.input_power_mask > 0 else False
-    else:
-        args.input_thermal_mask = None
-        args.input_power_mask = None
 
 
     # override the default value for change block aspect ratio
