@@ -63,10 +63,11 @@ class SharedEncoder(nn.Module):
         output = self.encoder(input)
 
         if self.graph:
-            graph_data = []
-            for k in graph_data_batch.keys():
-                if k in ['x', 'y', 'z', 'w', 'h', 'area', 'placed']:
-                    graph_data.append(graph_data_batch[k])
+            # graph_data = []
+            # for k in graph_data_batch.keys():
+            #     if k in ['x', 'y', 'z', 'w', 'h', 'area', 'placed']:
+            #         graph_data.append(graph_data_batch[k])
+            graph_data = [graph_data_batch[k] for k in ['x', 'y', 'z', 'w', 'h', 'area', 'placed']]
             graph_data = torch.stack(graph_data, dim=-1).to(input.device)
 
             adj_mat = graph_data_batch['adj_mat_mov'].to(input.device)

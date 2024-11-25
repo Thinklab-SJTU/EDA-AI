@@ -61,7 +61,7 @@ class PlaceEnv(gym.Env):
         self.ratio_range = ratio_range
         self.async_place = async_place
         self.device = device
-        self.return_device = "cpu"
+        self.return_device = device
         self.place_order_die_by_die = place_order_die_by_die
         self.input_next_block = input_next_block
         self.reward_func = reward_args.reward_func
@@ -341,20 +341,29 @@ class PlaceEnv(gym.Env):
             # adjacency matrix
             s = n_preplaced
             e = n_preplaced + n_movable
-            self.adj_mat_mov = self.fp_info.adjacency_matrix[s:e,s:e].clone()
+            self.adj_mat_mov = self.fp_info.adjacency_matrix[s:e,s:e].clone().to(self.return_device)
             # set diagonal to 1
             self.adj_mat_mov[torch.eye(n_movable, dtype=bool)] = 1
             
             # node data
-            self.graph_x_init = torch.zeros(n_movable)
-            self.graph_y_init = torch.zeros(n_movable)
-            self.graph_z_init = torch.zeros(n_movable)
-            self.graph_w_init = torch.zeros(n_movable)
-            self.graph_h_init = torch.zeros(n_movable)
-            self.graph_area_init = torch.zeros(n_movable)
-            self.graph_placed_init = torch.zeros(n_movable)
+            # self.graph_x_init = torch.zeros(n_movable)
+            # self.graph_y_init = torch.zeros(n_movable)
+            # self.graph_z_init = torch.zeros(n_movable)
+            # self.graph_w_init = torch.zeros(n_movable)
+            # self.graph_h_init = torch.zeros(n_movable)
+            # self.graph_area_init = torch.zeros(n_movable)
+            # self.graph_placed_init = torch.zeros(n_movable)
+            # if not self.async_place:
+            #     self.graph_order_init = torch.zeros(n_movable)
+            self.graph_x_init = np.zeros(n_movable)
+            self.graph_y_init = np.zeros(n_movable)
+            self.graph_z_init = np.zeros(n_movable)
+            self.graph_w_init = np.zeros(n_movable)
+            self.graph_h_init = np.zeros(n_movable)
+            self.graph_area_init = np.zeros(n_movable)
+            self.graph_placed_init = np.zeros(n_movable)
             if not self.async_place:
-                self.graph_order_init = torch.zeros(n_movable)
+                self.graph_order_init = np.zeros(n_movable)
 
             for i in range(n_movable):
                 block = self.fp_info.get_block_by_movable_idx(i)
@@ -369,16 +378,24 @@ class PlaceEnv(gym.Env):
                     self.graph_order_init[i] = self.init_place_order.index(i)
         
         # reset
-        self.graph_x = self.graph_x_init.clone()
-        self.graph_y = self.graph_y_init.clone()
-        self.graph_z = self.graph_z_init.clone()
-        self.graph_w = self.graph_w_init.clone()
-        self.graph_h = self.graph_h_init.clone()
-        self.graph_area = self.graph_area_init.clone()
-        self.graph_placed = self.graph_placed_init.clone()
+        # self.graph_x = self.graph_x_init.clone()
+        # self.graph_y = self.graph_y_init.clone()
+        # self.graph_z = self.graph_z_init.clone()
+        # self.graph_w = self.graph_w_init.clone()
+        # self.graph_h = self.graph_h_init.clone()
+        # self.graph_area = self.graph_area_init.clone()
+        # self.graph_placed = self.graph_placed_init.clone()
+        # if not self.async_place:
+        #     self.graph_order = self.graph_order_init.clone()
+        self.graph_x = self.graph_x_init.copy()
+        self.graph_y = self.graph_y_init.copy()
+        self.graph_z = self.graph_z_init.copy()
+        self.graph_w = self.graph_w_init.copy()
+        self.graph_h = self.graph_h_init.copy()
+        self.graph_area = self.graph_area_init.copy()
+        self.graph_placed = self.graph_placed_init.copy()
         if not self.async_place:
-            self.graph_order = self.graph_order_init.clone()
-    
+            self.graph_order = self.graph_order_init.copy()
 
     def update_graph_data(self, block:Block):
         if block is None:
