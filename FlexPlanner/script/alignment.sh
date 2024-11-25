@@ -3,8 +3,8 @@ export CUDA_VISIBLE_DEVICES=0
 
 
 device=cuda
-num_env=16
-num_env_test=4
+num_env=8
+num_env_test=2
 overlap_ratio=0.1
 ent_coef=0.01
 num_preplaced_module=0
@@ -19,7 +19,7 @@ num_grid=128
 train=1
 save_fig=10
 lr=1e-4
-batch_size=64
+batch_size=128
 
 # alignment settings
 enable_alignment=1
