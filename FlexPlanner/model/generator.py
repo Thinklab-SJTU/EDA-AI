@@ -6,6 +6,9 @@ from utils import is_power_of_2
 
 class BaseGenerator(nn.Module):
     def __init__(self, n_grid:int, input_shape:tuple[int, int, int]) -> None:
+        """
+        input_shape: (C, H, W), which is the start shape of the generator.
+        """
         super().__init__()
 
         assert is_power_of_2(n_grid), f"n_grid = {n_grid}"
@@ -103,3 +106,48 @@ class InfoGANGenerator(BaseGenerator):
         out = out.view(out.shape[0], self.hidden_dim1, self.init_size, self.init_size)
         img = self.conv_blocks(out)
         return img
+
+
+class InfoGANGeneratorLight(BaseGenerator):
+    def __init__(self, n_grid:int, input_shape:tuple[int, int, int]) -> None:
+        super().__init__(n_grid, input_shape)
+
+        upscale = round(np.log2(n_grid // input_shape[-1]))
+        # in_channels = list(reversed([2**(i+1) for i in range(upscale)]))
+        # out_channels = list(reversed([2**i for i in range(upscale)]))
+        in_channels = [input_shape[0] for _ in range(upscale)]
+        out_channels = [input_shape[0] for _ in range(upscale)]
+
+        # init blocks
+        conv_blocks = [
+            nn.Conv2d(input_shape[0], in_channels[0], 3, stride=1, padding=1),
+            nn.BatchNorm2d(in_channels[0], 0.8),
+            nn.LeakyReLU(0.2, inplace=True),
+        ]
+
+        # intermediate blocks
+        for ci, co in zip(in_channels, out_channels):
+            conv_blocks.extend([
+                nn.Upsample(scale_factor=2),
+                nn.Conv2d(ci, co, 3, stride=1, padding=1),
+                nn.BatchNorm2d(co, 0.8),
+                nn.LeakyReLU(0.2, inplace=True),
+            ])
+        
+        # final blocks
+        conv_blocks.extend([
+            nn.Conv2d(out_channels[-1], out_channels[-1], 3, stride=1, padding=1),
+            nn.BatchNorm2d(out_channels[-1], 0.8),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Conv2d(out_channels[-1], 1, 3, stride=1, padding=1),
+            nn.Tanh(),
+        ])
+        
+        self.conv_blocks = nn.Sequential(*conv_blocks)
+    
+
+    def forward(self, x:torch.Tensor) -> torch.Tensor:
+        """Input is from SharedEncoder, shape is [B,C]"""
+        b = x.shape[0]
+        x = x.view((b,) + self.input_shape)
+        return self.conv_blocks(x)

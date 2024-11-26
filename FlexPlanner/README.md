@@ -10,7 +10,7 @@ conda install pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.6 -c pytorch -c
 # CUDA 11.3
 conda install pytorch==1.12.1 torchvision==0.13.1 cudatoolkit=11.3 -c pytorch
 # tensorboard and tensorboard-data-server
-conda install tensorboard==2.12.0
+conda install tensorboard==2.17.0
 pip install -r requirements.txt
 ```
 

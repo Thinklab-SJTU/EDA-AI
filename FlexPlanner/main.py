@@ -77,11 +77,7 @@ else:
     raise NotImplementedError("input_next_block = {} is not implemented".format(args.input_next_block))
 
 shared_encoder_cls = getattr(model, args.shared_encoder_cls)
-if shared_encoder_cls is model.SharedEncoder:
-    shared_encoder = model.SharedEncoder(shared_encoder_input_channel, args.graph, args.shared_encoder_final_shape)
-else:
-    raise NotImplementedError("shared_encoder_cls = {} is not implemented".format(args.shared_encoder_cls))
-
+shared_encoder = model.SharedEncoder(shared_encoder_input_channel, args.graph, args.shared_encoder_final_shape, num_grid_x, shared_encoder_cls, episode_len)
 
 # construct ratio_decider
 if args.enable_ratio:

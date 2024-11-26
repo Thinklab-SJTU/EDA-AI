@@ -32,7 +32,7 @@ class Transformer(nn.Module):
     """
     This is the backbone to process graph feature in the shared encoder.
     """
-    def __init__(self, in_dim:int, hid_dim:int, out_dim:int, n_layers:int):
+    def __init__(self, in_dim:int, hid_dim:int, out_dim:int, n_layers:int, episode_len:int):
         super().__init__()
         self.fc0 = nn.Linear(in_dim, hid_dim)
         self.fc1 = nn.Linear(hid_dim, out_dim)
@@ -43,7 +43,7 @@ class Transformer(nn.Module):
         self.transformer = nn.TransformerEncoder(enc_layer, num_layers=n_layers)
         self.invalid_node = nn.Parameter(torch.randn(1, hid_dim))
 
-        self.pe = PositionalEncoding(300, hid_dim, trainable=False)
+        self.pe = PositionalEncoding(episode_len+1, hid_dim, trainable=False)
 
     def forward(self, x:torch.Tensor, adj_mat:torch.IntTensor, idx:torch.LongTensor, order:torch.LongTensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
@@ -71,7 +71,7 @@ class Transformer(nn.Module):
         return emb_global, emb_local
 
 
-def create_graph_model(graph:int, shared_encoder_output_dim:int, hid_dim:int=32, transformer_out_dim:int=32) -> tuple[Transformer, nn.Linear]:
+def create_graph_model(graph:int, shared_encoder_output_dim:int, episode_len:int, hid_dim:int=32, transformer_out_dim:int=32) -> tuple[Transformer, nn.Linear]:
     """
     Arguments:
         @graph:int.
@@ -107,7 +107,7 @@ def create_graph_model(graph:int, shared_encoder_output_dim:int, hid_dim:int=32,
     else:
         raise ValueError(f"graph should be 0, 1, 2, 3, got {graph}")
     
-    transformer = Transformer(in_dim, hid_dim, transformer_out_dim, n_layers=2)
+    transformer = Transformer(in_dim, hid_dim, transformer_out_dim, n_layers=2, episode_len=episode_len)
     return transformer, fc_graph
 
 

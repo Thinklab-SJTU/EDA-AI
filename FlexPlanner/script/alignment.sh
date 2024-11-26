@@ -32,6 +32,11 @@ use_alignment_constraint=1
 reward_weight_alignment=0.5
 
 shared_encoder_cls=SharedEncoder
+# shared_encoder_cls=SharedEncoderLight
+
+deconv_class=InfoGANGenerator
+# deconv_class=InfoGANGeneratorLight
+# deconv_class=TransposedConv
 
 graph=2
 
@@ -107,7 +112,8 @@ if [ -n "${statistics}" ]; then
 fi
 
 
-result_dir=result/${circuit}
+# result_dir=result/${circuit}-aln=${num_alignment}-G=${graph}-async=${async_place}-E=${shared_encoder_cls}-D=${deconv_class}
+result_dir=result/${circuit}-aln=${num_alignment}-G=${graph}-async=${async_place}
 
 
 # if have defined the variable `checkpoint`, add more comment to the `result_dir`
@@ -193,6 +199,7 @@ nohup python -u main.py \
     --batch_size ${batch_size} \
     --add_virtual_block ${add_virtual_block} \
     --use_alignment_constraint ${use_alignment_constraint} \
+    --deconv_class ${deconv_class} \
     ${additional_args} \
     > ${result_dir}/log.txt 2>&1 &
 
