@@ -21,23 +21,19 @@ save_fig=10
 lr=1e-4
 batch_size=128
 
+
 # alignment settings
 enable_alignment=1
 num_alignment=30
 alignment_rate=0.1
 alignment_sort=area
-# alignment_sort=divice
 input_alignment_mask=1
 use_alignment_constraint=1
 reward_weight_alignment=0.5
 
-
-
-
 shared_encoder_cls=SharedEncoder
-# shared_encoder_cls=ViT
 
-graph=1
+graph=2
 
 reward_func=5
 reward_weight_hpwl=1.0
@@ -50,9 +46,10 @@ add_last_step_reward_to_other_steps=1
 
 
 # input_sequence_critic=None
-input_sequence_critic=Transformer2
 # input_sequence_critic=CNN
 # input_sequence_critic=CNN2
+input_sequence_critic=Transformer2
+
 
 input_die_critic=1
 input_next_block=1
@@ -72,11 +69,10 @@ async_place_coef=1.0
 async_place_entropy_coef=1.0
 async_place_share_with_critics=0
 die_embedding=1
-# async_place_input_sequence=none
+# async_place_input_sequence=None
 # async_place_input_sequence=CNN
-# async_place_input_sequence=Transformer
+# async_place_input_sequence=CNN2
 async_place_input_sequence=Transformer2
-# async_place_input_sequence=LSTM
 
 
 place_order_die_by_die=0
@@ -111,7 +107,6 @@ if [ -n "${statistics}" ]; then
 fi
 
 
-# result_dir=result/${circuit}-n_aln=${num_alignment}-area=${area_util}/async=${async_place}
 result_dir=result/${circuit}
 
 

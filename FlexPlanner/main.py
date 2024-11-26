@@ -79,24 +79,6 @@ else:
 shared_encoder_cls = getattr(model, args.shared_encoder_cls)
 if shared_encoder_cls is model.SharedEncoder:
     shared_encoder = model.SharedEncoder(shared_encoder_input_channel, args.graph, args.shared_encoder_final_shape)
-elif shared_encoder_cls is model.ViT:
-    # use a dict to store all parameters
-    shared_encoder_params = OrderedDict()
-    shared_encoder_params["input_channels"] = shared_encoder_input_channel
-    shared_encoder_params["graph"] = args.graph
-    shared_encoder_params["final_shape"] = args.shared_encoder_final_shape
-    shared_encoder_params["image_size"] = num_grid_x
-    shared_encoder_params["patch_size"] = 8
-    shared_encoder_params["dim"] = 32
-    shared_encoder_params["depth"] = 2
-    shared_encoder_params["heads"] = 4
-    shared_encoder_params["mlp_dim"] = 64
-    shared_encoder_params["dim_head"] = 32
-    shared_encoder_params["dropout"] = 0.0
-    shared_encoder_params["emb_dropout"] = 0.0
-
-    shared_encoder = model.ViT(**shared_encoder_params)
-    utils.save_json(shared_encoder_params, os.path.join(result_dir, "ViT.json"))
 else:
     raise NotImplementedError("shared_encoder_cls = {} is not implemented".format(args.shared_encoder_cls))
 
@@ -134,8 +116,9 @@ else:
 local_encoder = model.LocalEncoder(shared_encoder.input_channels, 1)
 
 deconv_class = getattr(model, args.deconv_class)
+deconv_model = deconv_class(num_grid_x, shared_encoder.final_shape)
 actor = model.Actor(
-    num_grid_x * num_grid_y, shared_encoder, local_encoder, args.actor_update_shared_encoder, deconv_class=deconv_class, layer_decider=layer_decider,
+    num_grid_x * num_grid_y, shared_encoder, local_encoder, args.actor_update_shared_encoder, deconv_model=deconv_model, layer_decider=layer_decider,
     wiremask_bbo=wiremask_bbo, ratio_decider=ratio_decider, norm_wiremask=args.norm_wiremask, 
     input_partner_die=args.input_partner_die, input_alignment_mask=args.input_alignment_mask, input_next_block=args.input_next_block, use_ready_layers_mask=False, 
     use_alignment_constraint=args.use_alignment_constraint, set_vision_to_zero=args.set_vision_to_zero, set_canvas_to_zero=args.set_canvas_to_zero, 

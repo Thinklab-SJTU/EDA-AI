@@ -1,5 +1,4 @@
 import torch
-import torchvision
 from torch import nn
 from einops import rearrange, repeat
 from typing import Tuple
@@ -7,10 +6,9 @@ from tianshou.data import Batch, to_torch_as
 from typing import Union
 import numpy as np
 from .shared_encoder import SharedEncoder
-from .generator import InfoGANGenerator, TransposedConv
+from .generator import InfoGANGenerator
 from .ratio_decider import RatioDecider
 from .layer_decider import LayerDecider
-from torch.distributions import constraints
 
 
 def split(n:int, num:int) -> list[int]:
@@ -43,14 +41,14 @@ class LocalEncoder(nn.Module):
 class Actor(nn.Module):
     def __init__(self, 
             num_act:int, shared_encoder:SharedEncoder, local_encoder:LocalEncoder, actor_update_shared_encoder:bool, ratio_decider:RatioDecider,
-            deconv_class:type[InfoGANGenerator], layer_decider:LayerDecider,
+            deconv_model:type[InfoGANGenerator], layer_decider:LayerDecider,
             wiremask_bbo:bool, norm_wiremask:bool, input_partner_die:bool, input_alignment_mask:bool, 
             input_next_block:int, use_ready_layers_mask:bool, use_alignment_constraint:bool, set_vision_to_zero:int, set_canvas_to_zero:int,
         ) -> None:
         super().__init__()
         n_grid = int(num_act ** 0.5)
         self.shared_encoder = shared_encoder # global encoder for the whole chip
-        self.transposed_conv = deconv_class(n_grid, self.shared_encoder.final_shape) # deconv the output of shared_encoder to the same shape as the original canvas
+        self.transposed_conv = deconv_model # deconv the output of shared_encoder to the same shape as the original canvas
         self.local_encoder = local_encoder # relatively light-weighted encoder for local convolution
         self.fusion_module = nn.Conv2d(2, 1, 1) # this module should output final score mask
         self.actor_update_shared_encoder = actor_update_shared_encoder

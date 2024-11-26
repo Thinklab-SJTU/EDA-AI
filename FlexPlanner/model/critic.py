@@ -1,46 +1,11 @@
 import torch
-import torchvision
 from torch import nn
 from tianshou.data import Batch, to_torch_as
 from .shared_encoder import SharedEncoder
 import numpy as np
-from einops.layers.torch import Rearrange
-import config
-from .sequence_encoder import SequenceEncoderCNN as SequenceEncoderCNN2
-from .layer_decider import DieEmbedding
-from .transformer2 import Transformer2
-
-class SequenceEncoderBase(nn.Module):
-    def __init__(self, in_channels:int, num_die:int):
-        super().__init__()
-        self.rearrange = None
-        self.seq_encoder = None
-    
-    def forward(self, seq_feat:Batch) -> torch.Tensor:
-        """
-        @param seq_feat: [B, L, N, C], L is num_die, N is num_blk
-        @return: [B, L*out_channels], L is num_die
-        """
-        seq_feat = torch.stack([seq_feat[key] for key in config.sequence_feature_keys], dim=-1) # [B, L, N, C]
-        x = self.rearrange(seq_feat)
-        x = self.seq_encoder(x)
-        return x
+from . import sequence_encoder as SeqEnc
 
 
-class SequenceEncoderCNN(SequenceEncoderBase):
-    def __init__(self, in_channels:int, hidden_channels:int, out_channels:int, num_die:int):
-        """in_channels and out_channels are dim for each die, not the total."""
-        super().__init__(in_channels, num_die)
-        self.rearrange = Rearrange('B L N C -> B (L C) N')
-        self.seq_encoder = nn.Sequential(
-            nn.Conv1d(num_die*in_channels, num_die*hidden_channels, 7, 1, 3, groups=num_die),
-            nn.ReLU(),
-            nn.Conv1d(num_die*hidden_channels, num_die*hidden_channels, 5, 1, 2, groups=num_die),
-            nn.ReLU(),
-            nn.Conv1d(num_die*hidden_channels, num_die*out_channels, 3, 1, 1, groups=num_die),
-            nn.AdaptiveMaxPool1d(1), # [B, num_die*out_channels, 1]
-            Rearrange('b c 1 -> b c'), # [B, num_die*out_channels]
-        )
 
 class Critic(nn.Module):
     def __init__(self, 
@@ -81,11 +46,11 @@ class Critic(nn.Module):
             seq_out_dim = 32
             final_input_dim += seq_out_dim*num_die
             if self.input_sequence_critic == "CNN":
-                self.seq_enc = SequenceEncoderCNN(seq_in_dim, seq_hid_dim, seq_out_dim, num_die)
+                self.seq_enc = SeqEnc.SequenceEncoderCNN(seq_in_dim, seq_hid_dim, seq_out_dim, num_die)
             elif self.input_sequence_critic == "Transformer2":
-                self.seq_enc = Transformer2(seq_in_dim, seq_hid_dim, seq_out_dim, nhead=4, num_layers=2)
+                self.seq_enc = SeqEnc.Transformer2(seq_in_dim, seq_hid_dim, seq_out_dim, nhead=4, num_layers=2)
             elif self.input_sequence_critic == "CNN2":
-                self.seq_enc = SequenceEncoderCNN2(seq_in_dim, seq_hid_dim, seq_out_dim, num_die)
+                self.seq_enc = SeqEnc.SequenceEncoderCNN2(seq_in_dim, seq_hid_dim, seq_out_dim, num_die)
             else:
                 raise NotImplementedError(f"input_sequence_critic={self.input_sequence_critic} is not supported")
 

@@ -3,8 +3,9 @@ from torch import nn
 import torchvision
 import numpy as np
 from utils.utils import is_power_of_2
-from .transformer import Transformer
+from . import graph_model as GraphModel
 from tianshou.data import Batch
+
 
 class SharedEncoder(nn.Module):
     """
@@ -28,28 +29,8 @@ class SharedEncoder(nn.Module):
 
         # graph
         self.graph = graph
-        if graph:
-            in_dim = 7
-            hid_dim = 32
-            if graph == 1:
-                out_dim = self.last_channel
-            elif graph == 2:
-                out_dim = 32
-                self.fc_graph = nn.Sequential(
-                    nn.Linear(out_dim*2+self.last_channel, self.last_channel),
-                    nn.ReLU(),
-                    nn.Linear(self.last_channel, self.last_channel),
-                )
-            elif graph == 3:
-                out_dim = 32
-                self.fc_graph = nn.Sequential(
-                    nn.Linear(out_dim+self.last_channel, self.last_channel),
-                    nn.ReLU(),
-                    nn.Linear(self.last_channel, self.last_channel),
-                )
-            else:
-                raise ValueError(f"graph should be 0, 1, 2, 3, got {graph}")
-            self.transformer = Transformer(in_dim, hid_dim, out_dim, n_layers=2)
+        if graph > 0:
+            self.transformer, self.fc_graph = GraphModel.create_graph_model(graph, self.last_channel)
 
 
     def forward(self, stacked_mask: torch.Tensor, graph_data_batch:Batch) -> torch.Tensor:
@@ -63,29 +44,7 @@ class SharedEncoder(nn.Module):
         output = self.encoder(input)
 
         if self.graph:
-            # graph_data = []
-            # for k in graph_data_batch.keys():
-            #     if k in ['x', 'y', 'z', 'w', 'h', 'area', 'placed']:
-            #         graph_data.append(graph_data_batch[k])
-            graph_data = [graph_data_batch[k] for k in ['x', 'y', 'z', 'w', 'h', 'area', 'placed']]
-            graph_data = torch.stack(graph_data, dim=-1).to(input.device)
-
-            adj_mat = graph_data_batch['adj_mat_mov'].to(input.device)
-            curr_node = graph_data_batch['idx'].long()
-            order = graph_data_batch['order'].long() if 'order' in graph_data_batch.keys() else None
-
-            emb_global, emb_local = self.transformer(graph_data, adj_mat, curr_node, order)
-            if self.graph == 1:
-                output = output + emb_global + emb_local
-            elif self.graph == 2:
-                output = torch.cat([output, emb_global, emb_local], dim=-1)
-                output = self.fc_graph(output)
-            elif self.graph == 3:
-                output = torch.cat([output, emb_local+emb_global], dim=-1)
-                output = self.fc_graph(output)
-            else:
-                raise ValueError(f"graph should be 0, 1, 2, 3, got {self.graph}")
-
+            output = GraphModel.forward_graph_model(self.graph, self.transformer, self.fc_graph, output, graph_data_batch)
 
         return output
     

@@ -2,7 +2,6 @@ import torch
 from torch import nn
 from torch.distributions import Normal
 from einops.layers.torch import Rearrange
-from typing import Union, Tuple
 
 
 class VanillaNormal(Normal):

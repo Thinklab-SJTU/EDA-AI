@@ -37,11 +37,6 @@ class TransposedConv(BaseGenerator):
         in_channels[0] = input_shape[0]
         out_channels = list(reversed([2**i for i in range(upscale)]))
 
-        
-        print("[INFO][TransposedConv] input_shape should be {}".format((-1,) + input_shape))
-        print("[INFO][TransposedConv] in_channels = {}".format(in_channels))
-        print("[INFO][TransposedConv] out_channels = {}".format(out_channels))
-
 
         for in_c, out_c in zip(in_channels, out_channels):
             deconv.append(nn.ConvTranspose2d(in_c, out_c, kernel_size=3, stride=2, padding=1, output_padding=1, dilation=1))
@@ -97,88 +92,6 @@ class InfoGANGenerator(BaseGenerator):
         ])
         
         self.conv_blocks = nn.Sequential(*conv_blocks)
-
-        # self.count_parameters()
-    
-
-    def forward(self, x:torch.Tensor) -> torch.Tensor:
-        """Input is from SharedEncoder, shape is [B,C]"""
-        gen_input = x
-        out = self.l1(gen_input)
-        out = out.view(out.shape[0], self.hidden_dim1, self.init_size, self.init_size)
-        img = self.conv_blocks(out)
-        return img
-
-
-
-
-class InfoGANGeneratorNoBatchNorm(BaseGenerator):
-    def __init__(self, n_grid:int, input_shape:tuple[int, int, int]) -> None:
-        super().__init__(n_grid, input_shape)
-        input_dim = np.prod(input_shape)
-        hidden_dim1 = 32
-        hidden_dim2 = 16
-        self.hidden_dim1 = hidden_dim1
-        self.hidden_dim2 = hidden_dim2
-
-        self.init_size = input_shape[-1]  # Initial size before upsampling
-        self.l1 = nn.Sequential(nn.Linear(input_dim, hidden_dim1 * self.init_size ** 2))
-
-        
-        self.conv_blocks = nn.Sequential(
-            nn.Upsample(scale_factor=2),
-
-            nn.Conv2d(hidden_dim1, hidden_dim1, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Upsample(scale_factor=2),
-
-            nn.Conv2d(hidden_dim1, hidden_dim2, 3, stride=1, padding=1),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(hidden_dim2, 1, 3, stride=1, padding=1),
-            nn.Tanh(),
-        )
-
-        # self.count_parameters()
-    
-
-    def forward(self, x:torch.Tensor) -> torch.Tensor:
-        """Input is from SharedEncoder, shape is [B,C]"""
-        gen_input = x
-        out = self.l1(gen_input)
-        out = out.view(out.shape[0], self.hidden_dim1, self.init_size, self.init_size)
-        img = self.conv_blocks(out)
-        return img
-    
-
-
-class InfoGANGeneratorLayerNorm(BaseGenerator):
-    def __init__(self, n_grid:int, input_shape:tuple[int, int, int]) -> None:
-        super().__init__(n_grid, input_shape)
-        input_dim = np.prod(input_shape)
-        hidden_dim1 = 32
-        hidden_dim2 = 16
-        self.hidden_dim1 = hidden_dim1
-        self.hidden_dim2 = hidden_dim2
-
-        self.init_size = input_shape[-1]  # Initial size before upsampling
-        self.l1 = nn.Sequential(nn.Linear(input_dim, hidden_dim1 * self.init_size ** 2))
-
-        
-        self.conv_blocks = nn.Sequential(
-            nn.LayerNorm([hidden_dim1, self.init_size, self.init_size]),
-            nn.Upsample(scale_factor=2),
-
-            nn.Conv2d(hidden_dim1, hidden_dim1, 3, stride=1, padding=1),
-            nn.LayerNorm([hidden_dim1, self.init_size*2, self.init_size*2]),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Upsample(scale_factor=2),
-
-            nn.Conv2d(hidden_dim1, hidden_dim2, 3, stride=1, padding=1),
-            nn.LayerNorm([hidden_dim2, self.init_size*4, self.init_size*4]),
-            nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(hidden_dim2, 1, 3, stride=1, padding=1),
-            nn.Tanh(),
-        )
 
         # self.count_parameters()
     

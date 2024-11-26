@@ -1,35 +1,9 @@
 import torch
 from torch import nn
-from einops.layers.torch import Rearrange, Reduce
-from einops import rearrange, repeat
-from typing import Union, Tuple
+from einops.layers.torch import Rearrange
 from tianshou.data import Batch, to_torch_as
-from .sequence_encoder import SequenceEncoderCNN
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
-from .transformer2 import Transformer2
-
-class DieEmbedding(nn.Module):
-    def __init__(self, num_die:int, dim:int, trainable:bool=True):
-        super().__init__()
-        self.trainable = trainable
-        if self.trainable:
-            self.die_embedding = nn.Embedding(num_die+1, dim)
-        else:
-            t = torch.arange(num_die+1).float()
-            t[0] = -1.0
-            t = repeat(t, 'n -> n c', c=dim)
-            self.register_buffer('die_embedding', t)
-    
-    def forward(self, die_idx:torch.LongTensor) -> torch.Tensor:
-        """
-        @param die_idx: [B], B is batch_size
-        @return: [B, C], C is dim
-        """
-        if self.trainable:
-            return self.die_embedding(die_idx)
-        else:
-            return self.die_embedding[die_idx]
-
+from . import sequence_encoder as SeqEnc
 
 class LayerDecider(nn.Module):
     """
@@ -78,7 +52,7 @@ class LayerDecider(nn.Module):
         
         # die embedding
         if self.enable_die_embedding:
-            self.die_embedding = DieEmbedding(num_die, num_die, trainable=False)
+            self.die_embedding = SeqEnc.DieEmbedding(num_die, num_die, trainable=False)
             input_dim_final_layer += 2*num_die # die_embedding, dim = num_die; num_blk_without_placing_order, dim = num_die.
             print("[INFO] Use die_embedding in LayerDecider")
             
@@ -90,9 +64,11 @@ class LayerDecider(nn.Module):
             input_dim_final_layer += num_die * seq_out_channels_each_die
             
             if async_place_input_sequence == 'CNN':
-                self.seq_encoder = SequenceEncoderCNN(seq_in_channels_each_die, 8, seq_out_channels_each_die, num_die)
+                self.seq_encoder = SeqEnc.SequenceEncoderCNN(seq_in_channels_each_die, 8, seq_out_channels_each_die, num_die)
+            elif async_place_input_sequence == 'CNN2':
+                self.seq_encoder = SeqEnc.SequenceEncoderCNN2(seq_in_channels_each_die, 8, seq_out_channels_each_die, num_die)
             elif async_place_input_sequence == 'Transformer2':
-                self.seq_encoder = Transformer2(seq_in_channels_each_die, 16, seq_out_channels_each_die, num_layers=2)
+                self.seq_encoder = SeqEnc.Transformer2(seq_in_channels_each_die, 16, seq_out_channels_each_die, num_layers=2)
             else:
                 raise NotImplementedError(f"async_place_input_sequence = {async_place_input_sequence} is not implemented")
             print(f"[INFO] Use sequence encoder {self.seq_encoder.__class__.__name__} in LayerDecider")
