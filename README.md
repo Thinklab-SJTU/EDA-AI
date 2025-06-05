@@ -4,7 +4,7 @@
 - NeurIPS 2023 paper "HubRouter: Learning Global Routing via Hub Generation and Pin-hub Connection" (*HubRouter*)
 - AAAI 2024 paper "PreRoutGNN for Timing Prediction with Order Preserving Partition: Global Circuit Pre-training, Local Delay Learning and Attentional Cell Modeling" (*PreRoutGNN*)
 - NeurIPS 2024 paper "FlexPlanner: Flexible 3D Floorplanning via Deep Reinforcement Learning in Hybrid Action Space with Multi-Modality Representation" (*FlexPlanner*)
-
+- ICML 2025 paper "DSBRouter: End-to-end Global Routing via Diffusion Schr¨odinger Bridge" (*DSBRouter*)
 # Citations
 
 If you find our paper/code useful in your research, please citing
@@ -50,5 +50,13 @@ If you find our paper/code useful in your research, please citing
   author={Zhong, Ruizhe and Du, Xingbo and Kai, Shixiong and Tang, Zhentao and Xu, Siyuan and Jianye, HAO and Yuan, Mingxuan and Yan, Junchi},
   booktitle = {Advances in Neural Information Processing Systems},
   year = {2024}
+}
+```
+```
+@inproceedings{shiDSBRouter,
+  title={DSBRouter: End-to-end Global Routing via Diffusion Schr¨odinger Bridge},
+  author={Liangliang Shi, Shenhui Zhang, Xingbo Du, Nianzu Yang, Junchi Yan},
+  booktitle = {International Conference on Machine Learning},
+  year = {2025}
 }
 ```
