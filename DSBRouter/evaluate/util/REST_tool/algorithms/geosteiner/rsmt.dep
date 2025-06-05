@@ -1,0 +1,3 @@
+rsmt.o rsmt.lo rsmt.dep : rsmt.c geosteiner.h logic.h memory.h prepostlude.h environment.h \
+ config.h gsttypes.h lpsolver.h $(LP_DEPS)  \
+ fputils.h steiner.h bitmaskmacros.h geomtypes.h
