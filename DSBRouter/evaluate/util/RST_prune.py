@@ -550,11 +550,11 @@ class Slover():
         # print(f'{id} before parent:{self.unionfindsets[id].parent}')
         self.unionfindsets[id].merge_edges_from_edges_set(self.edgesets[id])
         # self.SteinerPointAdd(id)
-        self.SteinerPointAdd_mix(id)
+        # self.SteinerPointAdd_mix(id)
         # print(f'{id} after parent:{self.unionfindsets[id].parent}')
         # if self.mode == 'of':
         #     self.SteinerPointAdd_of(id)
-        # self.SteinerPointAdd(id)
+        self.SteinerPointAdd(id)
         self.RouteGenerate(id)
         return self.selected_edges[id],self.final_edges
 
