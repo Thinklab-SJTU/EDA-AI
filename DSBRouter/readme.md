@@ -21,7 +21,8 @@ Implementation of the paper [DSBRouter: End-to-end Global Routing via Diffusion 
 
 4. Start to train
 
-   ```
+   ```bash
+   cd evaluate/
    torchrun --standalone --nproc_per_node=8 train.py \
    --method dsb --noiser flow --network uvit-b --batch_size 128 \
    --prior eda_prior --dataset eda_data --val_prior eda_prior --val_data eda_data \
@@ -33,6 +34,7 @@ Implementation of the paper [DSBRouter: End-to-end Global Routing via Diffusion 
 1. Put the tested [benchmark](https://www.google.com.hk/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwjqgZ_7zcGNAxX5f_UHHegTEpkQFnoECAwQAQ&url=http%3A%2F%2Fwww.ispd.cc%2Fcontests%2F08%2Fispd08rc.html&usg=AOvVaw0EJgZ1S3r5OUQf0rqRs8ee&opi=89978449) into the `./DSBRouter/preprocess/benchmark` folder.
    
    ```bash
+   cd evaluate/
    # --benchmark can be chosen in ['ibm-ada','abl-NN','abl-RST','IPSD-s4','IPSD-s','IPSD-b4','IPSD-b'] to reproduce the results in the paper.
    python inference.py --network uvit-b --benchmark ibm-ada \
    --simplify --reparam term --gamma_type linear_1e-3_1e-2 \
