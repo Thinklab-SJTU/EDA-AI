@@ -1,6 +1,6 @@
 # DSBRouter: End-to-end Global Routing via Diffusion Schr¨odinger Bridge
 
-Implementation of the paper [DSBRouter: End-to-end Global Routing via Diffusion Schr¨odinger Bridge](https://arxiv.org/abs/2403.14623). **The overall training code comes from https://github.com/chrisway613/SDSB**
+Implementation of the paper [DSBRouter: End-to-end Global Routing via Diffusion Schr¨odinger Bridge](https://icml.cc/virtual/2025/poster/45255). **The overall training code comes from https://github.com/chrisway613/SDSB**
 ## Training
 1. Use [nthurouter](https://www.cs.nthu.edu.tw/~tcwang/nthuroute/) to produce the routing result of training datasets. Then follow the preprocess steps in [hubrouter](https://github.com/Thinklab-SJTU/EDA-AI) to produce the images of initial pins and routes.
 2. Clone the repo & Initialize the env. For the torch, plz choose the right [version](https://pytorch.org/get-started/previous-versions/) according to your installed [cuda](https://developer.nvidia.com/cuda-toolkit-archive).
