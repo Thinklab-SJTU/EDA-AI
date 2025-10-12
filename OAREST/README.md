@@ -1,6 +1,6 @@
 # OAREST README
 
-This is an implementation of the paper **Train on Pins and Test on Obstacles for Rectilinear Steiner Minimum Tree** (OAREST).  
+This is an implementation of the  NeurIPS 2025 paper **Train on Pins and Test on Obstacles for Rectilinear Steiner Minimum Tree** (OAREST).  
 
 ![OAREST Pipeline.](https://anonymous.4open.science/api/repo/OAREST_figures-B8BE/file/OAREST_pipeline.png?v=17bee186)
 
