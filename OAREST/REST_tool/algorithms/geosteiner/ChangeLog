@@ -1,0 +1,2656 @@
+!2016-09-24  David M. Warme  <warme@dmw.warme.net>
+
+	* GeoSteiner version 5.1.  (Updated version number in
+	configure.ac, LICENSE, README and RELEASE_NOTES.)
+
+	* Revert copyright notices back to original owner prior to
+	acquisition by GeoSteiner, Inc.  (This corporation no longer
+	exists.)
+
+	* Completely restructured rand_points.c to use separate modules
+	for each pseudo-random number generator.  Added new generator
+	based on AES-256.  Completely reworked the command line switches,
+	allowing generator to be specified, adding direct support for seed
+	files, and adding a "binary" mode.  Updated the description of
+	rand_points in the manual too.
+
+	* Add support for new SteinLib "integer" format, adding new
+	costextension.h file, and lots of new code to egmp.c.
+
+	* Split fatal.[ch] off from general.h and utils.c.  Split new.c
+	off from utils.c.  These allow linking the new rand_points program
+	without dragging in the LP solver.
+
+	* Add -Wall -Werror to the compiler options.  Fix all of the
+	issues thereby detected.
+
+	* Eliminate "rename.h", which was a quick-and-dirty way to achieve
+	a clean namespace within libgeosteiner.a (i.e., all globally
+	defined symbols begin with either gst_ or _gst_).  All names that
+	need these prefixes now have them throughout the entire code
+	base.
+
+	* Major reorganization of the include files.  The previous need
+	for "rename.h" to be included *before* anything else produced a
+	rat's nest of header dependencies.  The "general.h" header has
+	been eliminated, "steiner.h" greatly reduced in size, and about 18
+	new header files created.  All header files now satisfy the
+	properties of "completeness" and "minimality".  In addition, the
+	signatures for all global functions provided by "foo.c" now reside
+	in a corresponding header named "foo.h".  To assure completeness,
+	"foo.h" is always the first header included by "foo.c".
+
+	* The FATAL() error mechanism was replaced with a more useful
+	one.
+
+	* Conversion of cputime_t to and from seconds (in either "int" or
+	"double" form) has now been centralized and cleaned up.  The
+	TICKS_PER_SEC macro is now used only in cputime.c.
+
+	* Eliminate "config.h" control over both local cuts and
+	checkpoint-restart.  Both of these features are now included
+	unconditionally.
+
+	* Improve floating-point unit management code to address both the
+	x87 and the SSE/SSE7 FPUs.  Eliminate old -ffloat-store hack.
+	Also eliminated the old "floating-point precision fix" config.h
+	option, which is no longer needed.
+
+	* Fix all of the --with-FOO configuration options so that they all
+	work correctly now.
+
+2015-04-11  David M. Warme  <warme@dmw.warme.net>
+
+	* Copyright (c) 2001, 2015 by GeoSteiner, Inc.  This work is
+	licensed under a Creative Commons Attribution 4.0 International
+	License.
+
+	* Modify Makefile.in to support automatic building of make
+	dependencies by generating a separate .dep file for each .c file.
+
+	* Remove license enforcement code.  Rename or remove several
+	configuration control flags (enable/disable various features).
+
+	* Modify docgen.c to allow a comment banner at the top of
+	functions.in that is ignored in all operating modes.  Added such a
+	comment banner to functions.in (for legal notices, modlog).
+
+	* Updated all version numbers to 5.0 for release.
+
+	* Modified Makefile.in to support "make tar" and "make doc".
+
+	* Updated INSTALL, LICENSE and README files for release.
+
+	* Replace all proprietary notices with CC BY 4.0 license notices.
+
+2006-02-12  David M. Warme  <warme@localhost.localdomain>
+
+	* Copyright (c) 2001, 2006 by GeoSteiner, Inc.
+
+Mon Feb 26 09:28:07 2001  David Warme  <warme@Emergent-IT.com>
+
+	* Geosteiner version 3.1.  Significant new features, including
+	efficient pruning of FSTs, enhanced numeric stability of the EFST
+	generator, and improvements to the branch-and-cut.
+
+	* Critical bug fix in lp_solve_2.3/solve.c: fixed try_branch
+	routine, which was still using the obsolete "Rows" global variable
+	instead of "lp -> rows" to copy the solution back out to the
+	caller.  This could result in premature cutoff and suboptimal
+	solutions.
+
+	* Critical bug fix in check_for_better_IFS (in bb.c): verify that
+	the solution vector x satisfies all of the 0-1 variable bounds.
+	This has always been the case when using CPLEX because the CPLEX
+	version of try_branch always completely solves each LP.  The
+	lp_solve version of try_branch, however, stops after 50 or so
+	pivots leaving us with an x vector that may not even satisfy the
+	bound constraints.  check_for_better_IFS was erroneously
+	recognizing some of these "infeasible basic solutions" as INTEGER
+	FEASIBLE SOLUTIONS.  When it later recomputed the objective
+	function, the bounds obtained were incorrect -- even totally
+	preposterous.  This could result in suboptimal solutions.
+
+	* Split several new files off from bb.c:  bbmain.c contains the
+	"main()" routine for the "bb" program, and all of the command line
+	processing stuff.  (This permits the branch-and-cut to be called
+	as a subroutine from prunefst.c, which has its own main routine.)
+	New files bbsubs.c and bbsubs.h now contain the subroutines for
+	handline bbnodes and bbtrees, creating and destroying bbinfo, and
+	for starting up and shutting down the LP solver, etc.
+
+	* Fixed numerous memory leaks in bb.c, especially the various
+	bbinfo and bbtree data structures.
+
+	* Replaced all calls to "printf" within the branch-and-cut with
+	calls to a new "tracef" routine.  The output produced by "tracef"
+	can be controlled by options specified in a new "tracef_control"
+	structure.  Currently, the only such option is to disable all
+	output from tracef.  This is an easy way to muzzle the
+	branch-and-cut when you want to call it as a subroutine (e.g.,
+	like prunefst.c now does).  The tracef_control structure is
+	currently global, a misfeature that should be corrected sometime.
+
+	* Encapsulated all startup and shutdown of the LP solver (i.e.,
+	CPLEX in a pair of new routines startup_lp_solver and
+	shutdown_lp_solver (in bbsubs.c).
+
+	* Encapsulated the creation of the bbinfo (including constraint
+	pool, LP formulation, branch-and-bound tree, and initial root
+	node) in a new "create_bbinfo" routine.  This routine returns a
+	bbinfo * such that the root node is inactive (in the heap waiting
+	to be selected for processing).  The branch_and_cut routine now
+	simply takes a single "bbinfo *" argument, which makes it easier
+	to call as a subroutine (e.g., from prunefst.c or other
+	applications).  We anticipate that in future versions, the caller
+	might instruct (via settable parameters) branch_and_cut to return
+	early -- before an optimal solution is proven -- and that the
+	computation can be continued by calling it again with the same
+	argument.  For example, the user might want to suspend the
+	computation when a specified gap is achieved, when the optimal
+	subtour relaxation is obtained, or when a certain number of
+	sufficiently good upper bounds are obtained, etc.  Partitioning
+	the problem setup code from the optimization code is a step in
+	this direction.
+
+	* Changes to "struct bbnode" (in bb.h): Widened the "var", "dir",
+	"depth" and "br1cnt" fields from 16 to 32 bits.  Replaced the
+	"xhist" and "xh_index" fields (and their associated
+	NUM_X_HISTORIES_PER_NODE equate) with a new "bheur" field that
+	holds data used to heuristically prioritize branch variables.
+	Added the new "x", and "cpiter" fields so that each node can
+	remember its most recent LP solution (and also the version of the
+	constraint pool that produced this LP solution).  If a node is
+	suspended and later resumed without any new constraints being
+	added to the pool, then we can skip re-solving the LP and go
+	straight on to the separation algorithms using the saved LP
+	solution.
+
+	* Added the new "zlb" field to "struct bbnode".  This array
+	records 2 values for each variable Xj:  the highest Xj=0 bound
+	seen and the highest Xj=1 bound seen.  For example, if a variable
+	Xj is non-basic at its upper bound of 1, then ZLB[j,0] = Z + d[j]
+	is a lower bound on the objective if Xj=0 is forced.  (Z is the
+	current objective value and d[j] is variable Xj's reduced cost.)
+	The "zlb" array accumulates the maximum lower bounds ever seen.
+	This improves the effectiveness of reduced cost variable fixing.
+	For example, if a certain LP instance results in a very high
+	reduced cost, then the lower bound that results is remembered even
+	if the bound is not currently high enough to cause the variable to
+	be fixed.  The variable may be fixed later on when the upper bound
+	improves below the "zlb" value -- even if the current Z+dj value
+	is not high enough to justify fixing.  These bounds are also
+	useful in choosing branch variables.
+
+	* Moved the next-node policy equates (NN_DEPTH_FIRST and
+	NN_BEST_NODE) from bb.c into bb.h.  Obsoleted the "z" and "x"
+	fields of the bbinfo.  All code now uses the per-node values
+	"bbip -> nodep -> z" and "bbip -> nodep -> x" instead.
+
+	* The bbinfo structure now contains a new "ubip" field instead of
+	the old "fstmst_index" field.  This provides better encapsulation
+	of the information needed by the upper bound heuristic.
+
+	* Added the "obj_scale" field to the CPLEX version of "struct
+	lpmem" (in bb.h) to support scaling of objective coefficients.
+	This is to work around unscaled infeasibility errors from CPLEX
+	when objective coefficients have large magnitudes.
+
+	* Modified the _MYCPX macros to properly address changes in the
+	CPLEX API beginning with CPLEX version 5.0.  Starting with 5.0,
+	the following routines changed names:  CPXloadbase ==>
+	CPXcopybase, CPXoptimize ==> CPXprimopt, INFBOUND ==>
+	CPX_INFBOUND.
+
+	* Added "-a N M" switch to "bb" program (CPLEX version only).
+	This forces the CPLEX LP to have at least N rows and M non-zeros
+	whenever it is allocated and/or reallocated.  The default rules
+	for allocating and reallocating the CPLEX problem sometimes cause
+	lots of reallocations.  This wastes some time, increases memory
+	fragmentation, and perhaps also wastes some memory.  This can be
+	avoided by using this switch to set the initial allocation to be
+	large enough.
+
+	* Added the "-B N" switch to "bb" program.  This lets the user
+	specify one of several (currently three) branch variable selection
+	policies.
+
+	* Removed the "-t X" switch that specified a lower bound threshold
+	at which to begin trial branch computations.  This was an
+	experimental routine whose purpose was to discover properties of
+	branch variables that were highly correllated with good
+	performance as branch variables.  The discovery was that variables
+	that spend long periods of time "stuck" at the same fractional
+	value are good branch variable candidates with high probability.
+	The probability seems to increase if their fractional value is
+	simple, such as 1/2, 1/3, 2/3, 1/4, 3/4, etc.  The new branch
+	variable selection code now makes use of these discoveries, so
+	this switch (and the experimental test_branching_variables()
+	routine) were removed.
+
+	* Added the "-T N" switch to "bb".  This says to be N times more
+	thorough in looking for good branch variable candidates during
+	strong branching.  If the default would be to check candidate
+	variables (in order by most promising to least promising) and stop
+	scanning when K consecutive variables have failed to find an
+	improvement, then this switch would stop after K*N consecutive
+	failures.
+
+	* Added the "-z N" switch to "bb".  This forces the target size of
+	the constraint pool (in non-zeros) to be N.  On difficult
+	problems, the convergence rate can improve by keeping more
+	constraints in the pool.  N can be suffixed with a single letter
+	specifying a multiplier.  The suffixes/multipliers permitted are
+	k=1000, K=1024, m=1000000, M=1024*1024.  The new atoi_suf routine
+	performs this conversion of optionally suffixed decimal integers,
+	and is now used for all integer switch operands.
+
+	* Now always allocating root node, bbinfo, bbtree, lpmem bbstats,
+	etc. on the heap so that they can always be freed.
+
+	* Created new routine create_bbtree() to encapsulate all of the
+	details of creating/initializing an empty branch and bound tree.
+
+	* Initial lower bound of root node is now -DBL_MAX instead of 0.0
+	to make code work properly with negative objective coefficients.
+
+	* Save and restore the setting of the CPLEX "OBJULIM" parameter
+	across calls to branch_and_cut.  This makes branch_and_cut a bit
+	more re-entrant.  (Too bad all the CPLEX parameters are global and
+	not local to each problem...  This forces us to multiplex them all
+	when switching back and forth between problems that need different
+	parameter settings.)
+
+	* Rotate the main loop of branch_and_cut so that all nodes are
+	inactive upon entry.  The very top of the loop now selects the
+	next inactive node to activate and process.
+
+	* The choose_branching_variable() routine can now choose variable
+	-1, which means that branching of the node has been aborted.  This
+	happens when strong branching discovers one (or more) fractional
+	variables that cutoff on at least one of their two branches.  Such
+	variables are fixed to the opposite polarity and branching aborts.
+	Instead of branching, the main branch_and_cut loop either cuts the
+	node off (if the node's updated objective permits), or suspends
+	the node.  When resumed, constraint generation for this node
+	continues.
+
+	* Major changes to carefully_choose_branching_variable().  It now
+	uses the branch-heuristic values to sort all candidate (i.e.,
+	fractional) branching variables in order from most-promising to
+	least-promising.  The bheur values are lowest for variables that
+	have been "stuck" at the same value for the longest time.  These
+	values are adjusted for the "complexity" of the variable's
+	fractional value -- as determined using a Closest Rational
+	Approximation routine (new file cra.c).  Before moving on to the
+	expensive testing of candidate branch variables (by solving each
+	branch) we now first "estimate" the best of all fractional
+	variables using the node's "zlb" values.  The "strong" testing
+	commences using this pessimistic estimate of the best candidate.
+	Rather than perform a "strong" test on every variable, we now test
+	only the most promising ones, stopping after a certain number of
+	consecutively less promising variables actually fail to improve on
+	the best branch variable seen so far.  If nfrac < 20, the failure
+	limit is nfrac and all candidates are tested.  Otherwise the
+	failure limit is 2*N*floor(log2(nfrac)), where N is from the "-T
+	N" switch.  The strong branching loop can also now be aborted
+	using the "kill -15" signal.  Using the new "eval_branch_var()"
+	routine that encapsulates everything we need to do for testing
+	both branches of a single variable.  This routine also takes a
+	"test_2nd_val" threshold value that controls whether or not to
+	even evaluate the second branch.  eval_branch_var() also returns a
+	status indicating whether or not it was able to FIX the given
+	variable.  If so, then the strong branching loop aborts with no
+	branch variable chosen.  The new routine compare_branch_vars()
+	encapsulates all of the current branch variable selection
+	criteria, and the method of picking "test_2nd_val" threshold
+	values.  The new eval_branch_var() routine also runs the upper
+	bound heuristic on each LP solution obtained while doing "strong"
+	testing of branch vars, and also performs variable fixing whenever
+	a cutoff is achieved.
+
+	* Make eval_branch_var() unscale objective values coming from
+	try_branch() when using CPLEX.  We really ought to make try_branch
+	do this, but its calling convention does not permit this.
+
+	* The new compare_branch_vars() routine currently implements 3
+	different branch variable selection (i.e., comparison) policies.
+	Policy 0 is a naive maximum of of each variable's minimum branch
+	objective.  Policy 1 (the default) is a smarter lexicographic
+	version of the same.  When the variable's minimum branches are
+	very close, it compares the maximum branches.  Policy 2 compares
+	the product of the improvements provided by both branches, and
+	uses policy 1 to break very close ties.
+
+	* Now using a new store_double() routine (in utils.c) to fix the
+	Intel FPU problem in check_for_better_IFS().  Darn compilers keep
+	getting smarter than we would like them to sometimes...
+
+	* Node suspend and resume messages now display the objective value
+	of the node being suspended or resumed.
+
+	* Increased size of various "sprintf" buffers to avoid overflow
+	with large numbers or wide strings.
+
+	* Moved update_lp_solution_history() from bb.c into constrnt.c.
+	It is now called during each iteration of
+	solve_LP_over_constraint_pool() instead of once upon return from
+	this routine.  It now updates the "zlb", "x", and "bheur" values
+	instead of the xhist array (which has gone away).
+
+	* Because of bugs in lp_solve, we now wait until all separation
+	routines have been run (and violations discovered) before calling
+	delete_slack_rows_from_LP() when running with lp_solve.  Deleting
+	slack rows from lp_solve can cause the current basis to become
+	invalid.  If we return to the main branch_and_cut loop with an
+	invalid basis, then the lp_solve version of try_branch will croak
+	because no basis is present.  We avoid this by only deleting the
+	slack rows when we know we'll be adding new constraints.  When
+	running with CPLEX, we still delete the slack rows as soon as we
+	can.
+
+	* Re-enabled reduced_cost_var_fixing(), and deleted the comments
+	that indicate it can't be used.  It wasn't working before because
+	it was broken, not because the technique is invalid.
+
+	* Updated new_lower_bound() and new_upper_bound() to work properly
+	when the initial lower bound is set to -DBL_MAX instead of 0.
+	This is to properly handle negative edge weights.
+
+	* enumerate_all_subtours() and find_small_subtours() now take the
+	bbinfo argument, instead of just the current bbnode.
+
+	* do_separations() now applies the sec_flow_separator() only to
+	components for which no violations have been found.
+
+	* Modified reduced_cost_var_fixing() to drive off of the node's
+	"zlb" values.  Modified fix_variables() to not print one line per
+	variable fixed, but rather print a single summary line at the end
+	-- if any fixing was done.  When fixing vars, we now set the nodep
+	-> fixed and nodep -> value masks also.  If we don't do this, then
+	fixing gets forgotten across suspend/resume of the node.
+
+	* Now returning VFIX_FIXED_FRACTIONAL when
+	reduced_cost_var_fixing() / fix_variables() decides it can fix a
+	variable that currently has a fractional value.  In this case we
+	need to go back and re-solve the LP.
+
+	* Modified integer_feasible_solution() to accept as valid
+	solutions that use pruned edges.  It turns out that the heuristic
+	upper bound routine can produce such trees.  We should consider
+	ANY tree valid, even if it contains edges known to be suboptimal.
+	Also added early bailout if total cardinality of all edges in the
+	solution is bogus.
+
+	* Added new utility routine "append_node_to_tree()" to bbsubs.c.
+	The bbheap_free() routine now frees any unfinished nodes left in
+	the heap.  Sprouted new destroy_bbinfo() and destroy_bbnode()
+	routines to shutdown and free up the whole enchilada.
+
+	* Added new routines set_floating_point_double_precision(),
+	save_floating_point_precision(), and
+	restore_floating_point_precision() as a partial remedy to the
+	unpredictable precision problem when optimizing floating point
+	values in registers on the Intel x86 (and similar) architectures.
+	Using these routines we force the "PC" (precision control) field
+	of the floating point control word so that most floating point
+	results are automatically rounded to 53 bits of precision in the
+	mantissa.  Unfortunately, not all floating point instructions on
+	the processor obey the PC field setting (e.g., transcendental
+	functions still always yield a 64 bit result).  Also added checks
+	to the configure script to automatically detect when this fix is
+	both needed and works.  If this fix is needed but does NOT work
+	(e.g., x86 but not Linux) then we use "gcc -ffloat-store" as an
+	alternate workaround (further changes to configure.in,
+	aclocal.m4 and Makefile).  The -ffloat-store method isn't a great
+	alternative, however, because (a) it reduces floating point
+	efficiency substantially, (b) various versions of gcc have been
+	known to have bugs wherein -ffloat-store is occasionally ignored.
+
+	* Moved definition (i.e., storage allocation) of command line
+	switch variables from main routines (e.g., bb.c/bbmain.c) to the
+	file that really REFERENCES them.  This improves modularity by
+	making it easier to link these files into other programs without
+	having to define a lot of global variables to resolve link
+	errors.
+
+	* Added two new routines "bmst" and "bmst_terms" (to bmst.c) that
+	return the actual edges of the bottleneck MST -- instead of only
+	the MST length.
+
+	* Removed the "struct mstadj" from bsd.h.  It is now defined
+	locally within bsd.c.  Also removed the "mst_edges" and "mark"
+	members of "struct bsd".  They were not needed to answer BSD
+	queries, and are now purely local variables in compute_bsd.
+	Renamed the "pnum" field of "struct mstadj" to be "vnum" so that
+	this name no longer matches the "pnum" field in "struct point".
+
+	* Actually define and call the "shutdown_bsd" routine.
+	Previously, this routine was declared in bsd.h, but never defined
+	and never called.  This fixes the memory leak associated witht he
+	BSD info.
+
+	* Split off the expand_constraint routine into a new file
+	expand.c.  This file now encapsulates all translation of logical
+	constraints into physical constraint rows.
+
+	* Modified CPLEX version of build_initial_formulation() (in
+	constrnt.c) to scale the objective coefficients by a suitable
+	power of two and save this in the new lpmem -> obj_scale field so
+	that we can unscale all CPLEX results.  This is to work around the
+	unscaled infeasibility errors we get from CPLEX when the objective
+	contains coefficients with large magnitudes.
+
+	* Significant changes to solve_LP_over_constraint_pool() (in
+	constrnt.c):  Now that each node stores its own LP solution (Z and
+	X values), add early bailout if the constraint pool has not
+	changed since the last time we called solve-over-pool.  When
+	solving an LP, now receive the "x" and "dj" (solution vars and
+	reduced costs) into local buffers rather than directly into global
+	branch-and-bound buffers -- this permits proper update of the
+	node's "solution history" which includes the "z", "x", "zlb", and
+	"bheur" fields of the current node.  (Now that we have the "zlb"
+	field, the reduced costs aren't needed anywhere else in the code.)
+	Don't permit the pool iteration to be incremented to -1 so that we
+	can use that value to force LP re-solve when branching, fixing
+	variables, etc.  Added experimental code to delete slack rows
+	after iterations of solve-over-pool that have significantly
+	increased the lower bound -- this is useful for extremely large
+	problems that would run out of memory otherwise.  Added call to
+	the new prune_pending_rows() routine, which limits the number of
+	non-zeros added during a single iteration of solve-over-pool -- it
+	keeps only the sparsest rows that stay under the limit.
+
+	* Changes to solve_single_LP() (both the lp_solve and CPLEX
+	versions):  New calling convention returns the "x" and "dj" arrays
+	directly to the caller.  No longer update the "bbip -> z" field,
+	which is now obsolete -- each node is now the definitive
+	repository for its current objective value and solution data.
+	(constrnt.c)
+
+	* Modified CPLEX version of solve_single_LP() to unscale the
+	objective value and reduced costs by 2**(lpmem -> obj_scale).
+	This is to work around the unscaled infeasibility errors we get
+	from CPLEX when the objective contains coefficients with large
+	magnitudes.
+
+	* Modified reload_cplex_problem to only call _MYCPX_chgbds() if
+	there are any bounds to be changed.  Now calling _MYCPX_copybase()
+	instead of the obsolete _MYCPX_loadbase().  (constrnt.c)
+
+	* Modified add_constraints() to call prune_pending_rows() before
+	calling add_pending_rows_to_LP().  This is useful for very large
+	problems in that it limits the number of non-zeros that enter the
+	problem on any one LP/separate iteration -- only the sparsest of
+	the rows actually enter the LP (all rows generated do enter the
+	pool, however).  (constrnt.c)
+
+	* Added the new prune_pending_rows() routine.  It starts by
+	counting the number of non-zeros in the pending constraints.  The
+	routine bails out unless this count exceeds some threshold
+	(currently 2 million non-zeros).  If the caller approves, slack
+	rows are then deleted from the LP.  The pending rows are then
+	sorted from most-sparse to most-dense.  Those densest rows that
+	exceed the threshold are then forced to be non-pending once again.
+	This helps keep us from running out of memory on some very large
+	problems.
+
+	* Significant modifications to garbage_collect_pool() (in
+	constrnt.c):  Now counting the non-zeros that are currently
+	binding for ANY node (active or inactive) -- this is the total
+	number of pool non-zeros that are currently "useful".  Now using
+	the new equate "GRACE_TIME" to define the number of "grace"
+	iterations a constraint is given to become binding.  Now calling
+	sort_gc_candidates() as late as possible so that we can sometimes
+	avoid the extra work of sorting all these rows.  The target size
+	of the pool (in non-zeros) is now 16 times the number of "useful"
+	non-zeros OR ELSE "Target_Pool_Non_Zeros" (if the user has
+	specified -z) -- this seems to give more reasonable (i.e., larger)
+	pool sizes, and also allows the pool to grow more as new nodes are
+	processed (instead of squeezing ever more nodes' constraints into
+	a rigid global space limit).  Now bailing out early if the
+	impending pool size does not exceed the target pool size.
+
+	* Disabled the test in the CPLEX version of
+	delete_slack_rows_from_LP() that avoids deleting slack unless at
+	least 1/6 of the rows or 10% of the non-zeros would be deleted.
+	It really seems to be better overall if we always delete slack.
+
+	* The restore_node_basis() routine (constrnt.c) may now be called
+	on nodes that have no basis stored (e.g., when nodep -> cstat and
+	rstat are NULL).  This now happens when we "activate" the root
+	node the very first time.  In the CPLEX case, we now call
+	_MYCPX_copybase() to do this instead of the obsolete
+	_MYCPX_loadbase().
+
+	* Added new files cra.c and cra.h to compute Closest Rational
+	Approximations.  Used by the new branch variable ordering
+	heuristic.
+
+	* Split off add_cutset_to_list() and is_subset() routines
+	(originally in cutset.c) into the new cutsubs.c file.  Changed the
+	calling convention of add_cutset_to_list() so that it determines
+	the set of edges that span the cut internally rather having the
+	caller do this.  Got rid of the identify_cutset() routine, since
+	that was yet another copy of the code to determine the edges
+	spanning the cut.  The add_cutset_to_list() routine now
+	encapsulates all that we do when a cutset violation is detected.
+
+	* Modify calling convention of simple_cuts() and enumerate_cuts()
+	(in cutset.c) to take the LP solution instead of a temporary
+	cutset buffer.
+
+	* Removed the file-scope "debug_flag" from cutset.c -- definitely
+	obsolete.  This was used long ago to enable additional messages
+	without recompiling by setting debug_flag = 1 with a debugger.
+
+	* Modified the "dumpfst" program (in dumpfst.c) to implement the
+	new -d and -h options.  The -d flag gives a statistical summary of
+	the FSTs.  The -h flag gives a histogram of the number of FSTs of
+	by cardinality.  If neither -d nor -h is given, then "dumpfst"
+	functions as in the previous release.  Now using the common global
+	sort_ints routine, and also freeing up the phase 1 data when we
+	are done.
+
+	* Numeric stability improvements to efst.c (round 1): Use a
+	dynamically computed epsilon value for floating point
+	comparisons.
+
+	* Numeric stability improvements to efst.c (round 2): Translated
+	the initial point set to a new origin computed to be "central" to
+	the point set and have coordinates with relatively few significant
+	bits.  This maximizes the numeric resolution with respect to the
+	given data.
+
+	* Numeric stability improvements to efst.c (round 3): Perform all
+	computations for an eq-point with respect to an origin located at
+	one of its terminals.  This again maximizes the precision
+	available with respect to the given data.
+
+	* Numeric stability improvements to efst.c (round 4): Encapsulated
+	all movement of Steiner arc endpoints into new routines
+	(test_and_save_LP and test_and_save_RP) that are now much more
+	careful to make sure that the arc is not shortened any more than
+	can be justified numerically.
+
+	* Numeric stability improvements to efst.c (round 5): Introduced
+	the use of GMP (when available and requested via the -m Level
+	switch) to make sure that the final locations of all *accepted*
+	eq-points, and the lengths of all generated EFSTs are correct to
+	within 1/2 ULP.  (These computations are encapsulated within the
+	new files egmp.c and egmp.h.)  When GMP is not used, errors in the
+	location of eq-points can accumulate as the trees of terminals
+	comprising them get larger.  These accumulated errors also affect
+	the length of the Simpson line, and therefore also the final EFST
+	lengths.
+
+	* Copy description string to heap in main() of efst.c and rfst.c
+	so that it can get freed with the rest of the cinfo.  Also,
+	disable freeing of the point set that gets freed with the cinfo --
+	we don't want to free it twice.  Now freeing up the cinfo and
+	other data structures that were previously being leaked.
+
+	* Added some memsets at key places (in efst.c) so that structures
+	(e.g. struct point) that have "holes" in them get completely
+	initialized.  Doing block copies of uninitialized memory causes
+	warning messages when we use "purify" to find memory leaks.
+
+	* Modified efst.c so that the -e flag now specifies the INITIAL
+	allocation of equilateral points.  When this is not enough, the
+	arrays are dynamically reallocated and updated.
+
+	* Introduced new type "eterm_t" (in efst.h) used to store the
+	indices of terminals that comprise each eq-point.  Making this be
+	an "int16u" instead of a "short" to double the range of
+	permissible problem instance sizes.
+
+	* Freeing up the memory used by the rectangle data structure in
+	efst.c.
+
+	* Fixed bug in compute_efsts_for_unique_terminals() (in efst.c)
+	wherein term_check was allocated, initialized, and then allocated
+	once again.  This yielded a memory leak and an uninitialized
+	array.
+
+	* Fixed memory leak in build_fst_list() (in efst.c).
+
+	* Fixed bug in add_zero_length_fsts() (in efst.c) wherein the
+	added zero-length FSTs had incorrect vertex numbers in their FST
+	graph edges.
+
+	* Fixed save_eqp_rectangles (in efst.c) to avoid NULLing out the
+	squares array when there are no eqpoints to save.  This could have
+	produced stores beyond the end of the array.
+
+	* Fixed the wedge_test (in efst.c) to ignore terminals that are
+	part of the eq-point.
+
+	* Modified efst.c to handle new switches -f (epsilon factor), -g
+	(use new greedy heuristic instead of SLL), -m 0,1,2 (multiple
+	precision level).  Now also passing BSD info to upper bound
+	heuristics.
+
+	* Split off the elementary geometric functions (from efst.c and
+	sll.c) into new efuncs.h file that is designed to permit
+	inlining.
+
+	* Various cosmetic changes to efst.c (e.g., re-indenting, EQ
+	instead of ==, etc.) so that it conforms more closely to the
+	coding conventions used in the rest of the package.
+
+	* Modified efst.h to include a dynamic epsilon value, the point
+	set mean, the BSD argument to the SLL heuristic, and the new
+	greedy heuristic.
+
+	* Modified init_empty_rectangles() routine (in emptyr.c) so that
+	the "successor array" parameter can be NULL.  In this case, the
+	routine computes its own successor array internally by
+	heap-sorting the given point set by X and Y coordinates.
+
+	* Modified emst.c to get rid of its local copies of the
+	mst_edge_list() and sort_edge_list() routines.  It now uses the
+	common copies in the new mst.c file.  Renamed the build_edges()
+	routine to build_euclidean_edges() to distinguish it as the one
+	that builds the list of potential MST edges for the Euclidean
+	metric.  Deleted the "at_least"	parameter to
+	build_euclidean_edges() -- this was a cut-and-paste feature from
+	the rectilinear version that was only needed to support the
+	Kahng-Robins heuristic, and is not needed for the Euclidean case.
+	Also modified build_euclidean_edges() to just build the complete
+	graph for N < 10 points.  Now freeing up the data allocated by the
+	triangle package.
+
+	* Fixed bugs in emst.c that occur when duplicate points exist in
+	the input.
+
+	* Replaced old "redg" with new "fst2graph" program (fst2graph.c).
+	Whereas "regd" handled only rectilinear problems, "fst2graph"
+	handles both rectilinear and Euclidean problems by taking the
+	union of the FST edge graphs of all FSTs.  The default behavior
+	for rectilinear problems is to compute the reduced "grid" graph
+	just like "redg" did.  The FST edge graph can be requested instead
+	by giving the -e switch.  The "fst2graph" program now produces an
+	instance of the Steiner problem in graphs: in OR-library format by
+	default, but the -s switch requests SteinLib format instead.  With
+	rectilinear FSTs, the edge lengths will be scaled up to integer
+	values unless the -u switch is given (which causes unscaled data
+	to be emitted).
+
+	* Modified calling convention of define_Plot_Terminals() and
+	draw_segment() (in genps.c) to include the scaling information in
+	"struct scale *" form.
+
+	* Added new plot_subtour() routine (in genps.c) to display only
+	the (fractional) FSTs involved with a given subtour.  The vertices
+	of the subtour are printed black, and all other vertices are
+	printed light gray so that the subtour can be easily identified
+	visually.
+
+	* Modified define_coordinate_axes() (in genps.c) to unscale the
+	coordinates AFTER finding the min/max x/y coordinates.  Also
+	modified to always generate square plots having equal scales on
+	both the X and Y axes.  The old version would sometimes use
+	different scales for the two axes, which distorted the 120 degree
+	angles you would expect to see in a Euclidean Steiner tree.
+
+	* Increased size of title buffer in plot_full_sets(), and also the
+	coordinate buffers in draw_rfst().  (genps.c)
+
+	* Fixed incorrect printf format in the non-geometric case of
+	plot_lp_solution (in genps.c).
+
+	* Added new greedy heuristic (greedy.c) for use by the Euclidean
+	FST generator.  This upper bound is used instead of
+	Smith-Lee-Liebman when the -g switch is given to efst.  It is more
+	expensive than Smith-Lee-Liebman (sll.c), but tends to give better
+	solutions -- resulting in fewer eq-points generated.
+
+	* Major rework of input parsing, conversion and scaling mechanisms
+	(in io.c, steiner.h and all callers).  The "struct numlist" now
+	represents input lengths/coordinates in a semi-converted numeric
+	form rather than in textual form.  All scaling information is now
+	encapsulated in the new "struct scale_info", which holds both
+	scaling / unscaling info and output formatting info.  Globals
+	(e.g., Data_Num_Decimal_Places and min_precision) are no longer
+	used to hold onto the output formatting info -- the scale_info is
+	now explicitly passed to all places that need to format numbers
+	for output.  Introduced a new UNSCALE macro to do all unscaling --
+	it multiplies and divides by two pre-computed integral powers of
+	ten -- one (or both!) of which will always be 1.  The routines
+	coord_to_string(), dist_to_string(), get_points(),
+	init_output_conversion(), and read_numlist() now take the
+	encapsulated "struct scale_info *" as an explicit argument.  The
+	new routines compute_scaling_factor() and set_scale_info() support
+	all these changes.  The parse_one_number() routine now handles
+	numbers in scientific notation and/or with leading '+' signs.  The
+	dist_to_string() routine now correctly handles negative scale
+	factors (i.e., where internal numbers are smaller than external
+	numbers by a factor that is a power of ten).
+
+	* Fixed a bug compute_basic_incompat (in p1read.c) wherein it left
+	some elements of the incompat array uninitialized if compatibility
+	information was present.
+
+	* Modified read_version_0() (in p1read.c) to handle new "struct
+	numlist", which now encodes input numbers numerically, rather than
+	textually.  Also modified read_version_0() and read_version_2() to
+	use the new scaling machinery.  Made init_term_trees() and
+	compute_basic_incompat() non-static so that they can be called
+	from other programs (e.g., prunefst).
+
+	* Modified free_phase_1_data() (in p1read.c) to free up
+	everything.  The hyperedges, sizes, costs, tflags and term_trees
+	were being leaked.
+
+	* Fixed a minor bug in print_version_2() (in p1write.c) that
+	sometimes caused a line containing only a single tab to be
+	emitted.  Although this causes no grief when reading the FSTs back
+	in, it is a minor violation of our own formatting conventions.
+
+	* Modified print_version_2() to prevent pruned edges from being
+	listed as incompatible to any other.  This reduces the size of the
+	incompatible lists.  (p1write.c)
+
+	* Modified print_version_2() (in p1write.c) to eliminate a blank
+	line (containing only a single TAB character) that occurred for
+	FSTs having no incompatible FSTs.
+
+	* Renamed old "fsplot" program to be "plotfst".  Added the -p
+	switch to display only the point set, no FSTs.  It is a small
+	pity that if all you want is a plot of the terminals, you must
+	first generate FSTs...  (plotfst.c)
+
+	* Added new "prunefst" program to do FST pruning (new file
+	prunefst.c).  It works for both rectilinear and Euclidean FSTs,
+	using the method of F\"ossmeier and Kaufmann implemented using
+	ideas from Althaus.  This version uses VERY strong upper bounds
+	that are computed by calling the entire branch-and-cut.  On very
+	small subproblem instances, it is faster to use a simple backtrack
+	search (new files btsearch.c and btsearch.h) than to invoke the
+	higher overhead branch_and_cut.
+
+	* Modified rand_points.c to conform to all command line argument
+	processing in the standard way -- using a decode_params().  Also
+	added a usage() routine for when crud is given.
+
+	* Add -k option (in rfst.c) to permit a maximum FST size to be
+	specified.
+
+	* Removed unused "GREEDY_HEURISTIC" from rfst.c.  Added a new
+	NOSPLIT_CORNER_FLIPPED test that removes RFSTs whose
+	corner-flipped versions have terminals of degree two or more
+	(i.e., Steiner points coincident with a terminal).  These cannot
+	be easily recognized during generation, but once an RFST is done
+	and the corner-flipped topology is available, the test is quite
+	easy.  Added fatal error if any RFST edge has length zero.
+
+	* Added code to disconnect the RFSTs from the hash table so that
+	we can free up the hash table without leaving invalid pointers
+	lying around in the RFSTs.
+
+	* Removed some memory leaks from rfst.c, including the hash table,
+	BSD info, successor arrays, arrays for the various bounds.  Fixed
+	other memory leaks in compute_zt() -- the "offset[]" array and the
+	"struct ibuf" list.  Free up the "rlists" in build_fst_list().
+
+	* Removed unused variables from rfst.c: "dirp" and "ub0" in
+	compute_ub1(); "s" in grow_RFST(); "l", "r" and "t" in
+	test_and_save_fst(); "n" in renumber_terminals(); "j" in
+	add_zero_length_fsts().
+
+	* Added a call to memset() to completely initialize the new point
+	set in remove_duplicates() (in rfst.c) to eliminate "reference to
+	uninitialized memory" warnings from purify.  Initialize lrindex[]
+	for the very same reason.
+
+	* Split the sort_edge_list() and mst_edge_list() routines off from
+	rmst.c into the new mst.c file.  mst.c now contains the generic
+	MST routines that apply Kruskal's algorithm to an arbitrary list
+	of weighted 2-edges.  The Euclidean and rectilinear MST routines
+	now just build their metric-dependent edge lists and call the
+	common copy of mst_edge_list in mst.c.
+
+	* Renamed the build_edges() routine (in rmst.c) to be
+	build_rect_edges(), to distinguish it as the one that builds the
+	rectilinear edge list.  Also added a memset() call in kr_main() to
+	eliminate "read of uninitialize memory" warnings from purify.
+
+	* Added some debugging code (currently disabled) to the
+	sec_flow_separator() to display the subtour violation as either
+	component or "real" vertex numbers.  (sec2.c)
+
+	* Changed the calling convention of check_component_subtour() to
+	take a "struct bbinfo *" instead of a "struct cinfo *" (sec_comp.c
+	and callers).
+
+	* The original bi-connected components algorithm was WRONG!  It
+	was incorrectly adapted from the standard strongly-connected
+	components algorithm, (using only a "back" array) instead of the
+	classical bi-connected components (which uses both a "low" and a
+	"parent" array).  The incorrect version never broke a real BCC
+	apart, but there were cases where it yielded components that could
+	and should have been further reduced.  Corrected this in
+	sec_comp.c and all other places this algorithm was used (e.g., in
+	prunefst.c).
+
+	* Added new routine add_component_subtour() to centralize the
+	process of translating a component subtour back into a "real" one
+	and check for duplicates (and violations) before emitting it
+	(sec_comp.c).
+
+	* Changed terminology in sec2.c, sec_comp.c and sec_heur.c to
+	consistently use "vertex" and "edge" instead of "terminal" and
+	"full set".  All comments were changed, as were local variable
+	and routine names.
+
+	* Replaced the "tmasks" and "kverts" field of "struct comp" with
+	the "rverts" field.  Whereas "tmasks" was an array indexed by
+	component vertex containing an N-bits bitmask of vertices (where N
+	is the number of vertices in the ORIGINAL problem), the new
+	"rverts" is an array indexed by component vertex giving a LIST of
+	original vertex numbers.  Since these lists are virtually always 1
+	element long (the exception being merged chains), this will be
+	much more compact -- especially when dealing with small components
+	of very large problems.  Should also reduce the processing time
+	needed to initialize the data structure.
+
+	* Renamed several members of "struct comp" to favor "vertex" over
+	"terminal", and "edge" over "full set":  num_terms ==> num_verts,
+	num_fsets ==> num_edges, fsterms ==> everts, tfsets ==> vedges,
+	tmap ==> vert_mask, fset_mask ==> edge_mask.  (sec_comp.h and lots
+	of references all over the place!)
+
+	* The reductions in sec_comp.c were not being done as completely
+	as possible.  Whenever uncongested vertices are removed from a
+	component, we now force the CC and BCC tests to be run again.
+	This caused a noticeable improvement in performance, presumeably
+	due to (a) smaller problems to separate, and (b) improved
+	constraint strengthening.
+
+	* Completely replaced the merge_chains() routine (in sec_comp.c)
+	with a much more sophisticated algorithm.  The old version was
+	very slow, and quite closely tied to the old "tmasks" array which
+	is now obsolete.  The old algorithm did not translate too well to
+	the framework required by the new "rverts" array.  The new
+	algorithm runs in a number of distinct O(n) passes -- each pass
+	successively "homes in" more closely on those vertices and edges
+	that can be in a chain.  Finally it uses a disjoint-set union-find
+	to identify which chain each edge belongs to.
+
+	* Modified delete_vertex_from_component() to permit a negative
+	vertex number (sec_comp.c).  In this case, the component is just
+	re-simplified after whatever changes the caller may have made to
+	it.
+
+	* In check_component_subtour() (in sec_comp.c), added experimental
+	code for cleaning up constraints.  This code is an alternate
+	method (currently disabled) for computing the congested components
+	of the subtour that does not start over with the subgraph of the
+	original problem induced by the subtour vertices.  This method is
+	currently disabled because it probably misses some potential
+	reductions that are caught if you start all over.  Also added some
+	debugging code (currently disabled) to plot the LP solution,
+	the "unstrengthened" constraint found by the flow separator and
+	the strengthened subtour violations -- but only if the reductions
+	split the violation into at least 3 distinct subtours.  Now using
+	new add_component_subtour() routine to encapsulate component ==>
+	real translation, duplicate and violation testing.
+
+	* Made check_unique_subtour() non-static (sec_heur.c).  Changed
+	calling convention of enumerate_all_subtours() and
+	find_small_subtours() to take a "struct bbinfo *" instead of a
+	"struct bbnode *".
+
+	* Created completely new versions of enumerate_all_subtours() and
+	find_small_subtours() (in sec_heur.c).  The new versions are used
+	by default (#ifndef OLD_ENUMERATION), and use the new
+	recurse_enum() routine which is faster because it does not
+	recompute the constraint's LHS and RHS at each recursion level,
+	but updates these quantities inductively while recursing.  Added
+	the "struct bbinfo *" to the old recursive enumeration routine
+	(enumerate_subtours(), probably now obsolete).  In
+	find_small_subtours(), removed specially intense processing of
+	the root node and the first 4 "Xi = 0" branches -- we now use the
+	same intensity of enumeration at every node.
+
+	* Modified find_integer_cycles() and cwalk() (in sec_heur.c) to
+	eliminate near-infinite loops caused by attempting to find all
+	cycles in highly cyclic structure.  We now count EVERY cycle
+	discovered, whether previously seen or not -- and we no longer
+	reset the cycle counter at the beginning of each connected
+	component.  Whenever the cycle count exceeds the limit, we bail --
+	even skipping the unprocessed connected components.
+
+	* Fixed a bug in sll.c wherein the heuristic gave an infinite
+	length in the case where all input points were colinear.
+
+	* Modified sll.c to use efuncs.h, translate mean of point set to
+	the origin, use BSD information (if available), and to use dist_t
+	instead of double.  Added pre-declarations of all static
+	functions.
+
+	* Added new file sortints.c containing a new routine sort_ints()
+	that efficiently sorts an array of integers.  It does a single
+	bubble-sort scan.  If sufficiently little remains to be sorted, we
+	continue with bubble sort, otherwise we switch to heapsort.
+	Replaced all local copies with calls to this more intelligent
+	version.
+
+	* Patched triangle.c so that malloc() really invokes our own new()
+	routine.  This lets us handle malloc(0) properly, instead of
+	barfing with an "out of memory" error.
+
+	* Removed the obsolete compute_fstmst_index() routine, and added
+	the new "ubinfo" structure and the startup_heuristic_upper_bound()
+	and shutdown_heuristic_upper_bound() routines (in ub.c and ub.h).
+	These provide better encapsulation of the upper bound heuristic,
+	and make it easier to add more global state to it.
+
+	* Major improvements to the upper bound heuristic (in ub.c):
+	(1) It now repeats the computation using (up to) TWO different FST
+	rankings (FST/MST ratio, and len(e)/(|e|-1) ratio) -- the ranking
+	is used to break ties when two edges have the same LP weight.
+	(2) For each ranking, it performs greedy tree construction and
+	then repeats the greedy tree construction using a new edge
+	sequence wherein all MST edges are placed last.
+	(3) Each greedy tree construction starts with a single Kruskal run
+	to construct an initial tree.  After that, one of a set of
+	diversification procedures are applied: randomized rounding,
+	greedy local search, round robin, very greedy, and less greedy
+	(currently, the greedy local search seems to be the best).  Each
+	diversification procedure performs a sequence of K ~ log2(nedges)
+	additional Kruskal runs, each run chooses an edge to force into
+	the solution (by placing it first in the sorted list).  The
+	currently used greedy local search chooses the first edge in the
+	list that was NOT used by the previous Kruskal run.  Whenever an
+	improvement is used, the list of edges to force is replaced with
+	the current solution plus all 2-edges (thereby causing the search
+	to focus on using these edges).  If the current heuristic solution
+	is very close to the best known solution, then the search is
+	intensified by increasing the iteration limit K and restarting the
+	scan of edges at the beginning.  Only one such restart per run of
+	the greedy local search procedure is permitted.  The other
+	diversification procedures are currently disabled.  Read the code
+	for details on these.
+
+	* Modified all main() routines to do "exit (0)" instead of "return
+	(0)", since the latter does not work correctly on certain broken
+	operating systems.
+
+	* Added new lib_points program to extract point sets from either
+	OR-library or TSPLIB formatted files.
+
+	* Added new tracef() routine and tracef_control structure to
+	utils.c.  tracef() is now used exclusively instead of printf()
+	throughout the entire call tree reached by branch_and_cut(),
+	including the print_mask() routine (also in utils.c).  Added new
+	gst_strdup() routine, which does a strlen(), new() and strcpy().
+	This routine is our own portable and dependable version of
+	strdup().  Added the new store_double() routine that let's us
+	force double precision when the compiler/processor are giving us
+	too much precision.  Also added the configuration-dependent
+	routines for saving and restoring the floating point precision and
+	forcing it to double.  (utils.c)
+
+	* Fixed delete_row_set() (in lp_solve_2.3/lpkit.c) to modify the
+	basis more carefully when deleting rows.
+
+	* Modified isvalid() (in lp_solve_2.3/solve.c) to not complain
+	about empty columns that are fixed.
+
+	* Fixed minoriteration() (in lp_solve_2.3/solve.c) to not overflow
+	the eta allocation by 1, when exactly full on last item.
+
+	* Fixed disabled debugging code dualloop() (in
+	lp_solve_2.3/solve.c) to use lp->sum instead of defunc global
+	"Sum".
+
+	* Fixed dualloop() (in lp_solve_2.3/solve.c) to set Extrad = 0
+	when switching to the primal.
+
+	* Fixed try_branch() (in lp_solve_2.3/solve.c) to also return the
+	special "infeasible value" on cutoffs as well as infeasibility.
+
+	* Added new PT procedure to prelude.ps for use by new
+	plot_subtour() routine.
+
+	* Updated the INSTALL, LICENSE and README files for version 3.1.
+
+Mon Jan 11 07:46:39 1999  David Warme  <warme@s3i.com>
+
+	* Geosteiner version 3.0.  This is the combined efforts of David
+	Warme, Pawel Winter and Martin Zachariasen.  It is also the first
+	release of this code to the general research community.
+
+	* Obsoleted the following programs: prep, old_bs and rstprune.
+	prep was the Salowe-Warme rectilinear FST generator, old_bs was
+	the old backtrack-search FST concatenator, and rstprune was a
+	stand-alone rectilinear FST pruning program.  The following files
+	died as a result: art.c coarse.c compat.c decomp.c fine.c
+	gensets.c old_bs.c prep.c prune.c rstprune.c search.c.
+
+	* Introduced Warme's latest implementation of Zachariasen's
+	rectilinear FST generator.  This includes the following new files:
+	rfst.c rfst.h emptyr.c emptyr.h.  This new front-end is a
+	stand-alone command called "rfst".
+
+	* Got rid of most of the metric-specific stuff in steiner.h by
+	moving it into rfst.h.  All declarations specific to the
+	Salowe-Warme RFST generator are now gone.  Eliminated the
+	full_set.style field.
+
+	* Completely eliminated all compile-time limits on problem size!
+	For example, the "struct pset" now contains an array of only one
+	point, so all instances of this structure are dynamically
+	allocated to be the correct size.  The constants MAX_TERMINALS,
+	MAX_STEINERS, MAX_POINTS, and N_TERM_BMAP are now all dead!  The
+	pnum_t type is now int instead of int16s for greater range.  Made
+	the full_set.tree_num field be an int instead of inst16u for
+	greater range.
+
+	* While incorporating the new RFST generator, the disjoint-set
+	union-find code was split off as the new files dsuf.c and dsuf.h.
+	In addition, the rectilinear MST code was renamed from mst.c to
+	rmst.c, to make room for the arrival of Euclidean MST code.
+
+	* Completely replaced the bottleneck Steiner distance (BSD) code
+	in bsd.c.  Introduced the new file bsd.h to define its interface.
+	The new interface is much more general and can work with any
+	metric, since you give it an MST in edge-list form.  The new
+	interface also permits multiple internal representations for
+	storing the BSD matrix, which gets quite huge on large problems
+	since it grows O(n^2) with the number of terminals.  Currently we
+	only implement one representation -- a lower-triangular matrix of
+	MST edge numbers, requiring N^2 - N bytes of storage.  In the
+	future we may implement other schemes, including a row cache
+	scheme and the dynamic trees method.
+
+	* Completely renamed and redefined the routines to compute MST's
+	using the bottleneck Steiner distance (in bmst.c).  They now use
+	"bmst" in the name instead of "bottleneck_mst" and they use the
+	new BSD data structures for generality.
+
+	* Added the new dumpfst utility (file dumpfst.c).  This makes it
+	much easier to compare the outputs of different FST generators.
+
+	* Obsoleted the -a, -r and -s options of the fsplot command.
+	These controlled Print_Articulation_Components, Print_Relief_Map,
+	and Print_Split_Full_Sets, respectively.  Also obsoleted the file
+	relief.c that implemented the "relief map" plots.  "relief.c" has
+	not been useful for a long time, and its reliance on the
+	particular RFST encoding in the Salowe-Warme algorithm made it too
+	difficult to maintain.  The other options are just plain
+	obsolete.  Now using "FST" instead of "Full Set" in the titles of
+	the plots generated.
+
+	* Modified kr.c to handle dynamically sized struct pset's, and
+	eliminate the compile-time problem size limits.
+
+	* Modified redg.c to read an FST data file rather than a point
+	set.  This is now possible because of our requirement that the FST
+	graph for rectilinear FST's always represent a top-most and
+	left-most Hwang topology.  We can therefore just use the FST graph
+	to draw each FST onto the grid.  This gets rid of the -i and -o
+	command line switches for this program.
+
+	* Renamed the output.c file to be genps.c, which is more
+	descriptive of its function -- generating Postscript output.  The
+	definition of its interfaces were split off from steiner.h into
+	the new file genps.h.
+
+	* Integrated Martin Zachariasen's latest implementation of the
+	Winter-Zachariasen Euclidean FST generator.  Martin re-implemented
+	this in plain C (from C++ with LEDA) using my implementation of
+	his RFST generator as a template.  Martin also implemented a
+	simple version of the rectangle idea of Ernst Althaus, which
+	improves the performance manyfold on large uniformly distributed
+	instances.  The new files introduced are efst.c efst.h emst.c
+	sll.c triangle.c triangle.h.  Our hats off to Jonathan Shewchuk
+	for making his 	'triangle' code available for use in applications
+	like ours!
+
+	* Obsoleted the old submodular SEC separator, sec.c and sec.h.
+	The new flow formulation renders the old submodular code to the
+	junkheap of historical interest.
+
+	* Obsoleted the clique generator, clique.c and clique.h.  Oddly
+	enough, clique constraints only seemed to slow things down!
+
+	* Tossed a fragmentation grenade into the file utils.c, leaving
+	only four routines left in it!  All of which are reasonably
+	general.  The other routines were either deleted from lack of use,
+	or were moved into more appropriate files.
+
+	* Upgraded from lp_solve version 2.0 to version 2.3.  As it turns
+	out, the authors of that package have found *ALMOST* all of the
+	same bugs that I have!  Oh well, I was hoping for a major
+	improvement in its robustness.  Staying reasonably current has its
+	advantages, however.
+
+	* Modified lp_solve to recover better from failures to invert the
+	matrix, and to detect loss of primal feasibility.  Also changed
+	all of its error messages to print to stdout as postscript
+	comments rather than to stderr as postscript trash.  Added quite a
+	bit of debugging code to try to figure out why it is so unstable.
+	Answer: not very picky about the pivots it picks!  Need to USE the
+	lattitude afforded by the primal/dual simplex algorithms to find
+	better pivots.  This would steer us away from singular bases in
+	the long run!
+
+	* Eliminated data.c.  All of the command line switch flags have
+	now been moved to the various main program files (they are no
+	longer declared in steiner.h either), the one_bits_in_byte stuff
+	died with the backtrack search, Data_Num_Decimal_Places and Metric
+	now reside in the cinfo, and nbits moved into utils.c where it is
+	initialized.
+
+	* Retired cra.c -- a closest rational approximation.  This was an
+	attempt to improve the submodular SEC separator by getting rid of
+	numeric noise in the LP solution vectors.
+
+	* Retired mem.c.  Purify does a much better job at finding these
+	problems and more!
+
+	* Now using GNU autoconf to generate configure scripts!  This
+	makes building the software much easier.  The new Makefile.in
+	replaces Makefile in the distribution.  New distribution files
+	supporting this include aclocal.m4, config.h.in, configure,
+	configure.in, and install-sh.
+
+	* Improved the method by which bb.h includes the CPLEX header
+	file, and forces it to give us prototypes.  Also changed the
+	include of lpkit.h to get rid of the subdir portion and just let
+	the -I argument in the Makefile find it for us.
+
+	* Added LP solution history values to the bbnode, in preparation
+	for early branching heuristics (tailing off detection).  Also
+	added fields to the bbnode so that we can save and restore the LP
+	tableaux and basis when switching nodes.  Deleted all of the
+	statistics we used to collect about the now-defunct submodular SEC
+	separator.  Also added some new macros to bb.h for doing getbase
+	and loadbase operations in CPLEX.
+
+	* Modified the 'kill -15' handler so that it now forces the
+	problem to branch, rather than continue endlessly generating
+	constraints.  Also changed the name of the signal handler and flag
+	variable to be more descriptive of its new purpose.
+
+	* Modified the encoding of constraints in the constraint pool to
+	permit more than 32768 variables.  The estein10000.txt problem
+	instance yields 40878 FSTs, which exceeded this limit.  The new
+	encoding permits up to 65533 variables, which suffices for now.
+
+	* Replaced the old "record_binding_row_references" and
+	"delete_binding_row_references" routines with the newer ones
+	"save_node_basis", "restore_node_basis" and "destroy_node_basis".
+	These provide the enhanced functionality of saving and restoring
+	the entire LP tableaux and basis when switching nodes.
+
+	* The old versions 0 and 1 of the FST data format are now
+	completely obsolete.  Version 0 has now been redefined to be an
+	"extended OR-library" format for the Steiner problem in
+	hypergraphs.  Also introduced version 3 of the data which is the
+	new default.  Also added the PURE_GRAPH metric, which is valid for
+	both versions 2 and 3.
+
+	* Performed major surgery on the major data structures to conserve
+	memory.  The "struct cinfo" fields carray, cmasks, incmasks and
+	fset_concat_terms, are all GONE now.  The only remaining source of
+	compatibility info is the "inc_edges" array.  Also removed the
+	"tmap" field from each FST, as this was also getting huge.  To
+	reflect our more general focus on the hypergraph problem, we also
+	renamed the various "fset" and "term" fields to be "edge" and
+	"vert" respectively.  For example, we no longer have the
+	initial_tmap and initial_fset_mask, we have initial_vert_mask and
+	initial_edge_mask instead.  These changes required huge and
+	extensive changes to a number of sections of the code that relied
+	on the old data structures.  In many cases the algorithms needed
+	to become more complex.  In every case, however, the new code is
+	faster because less total memory is accessed.
+
+	* The point.other_pnum field is now obsolete.  All uses of it have
+	been eliminated.
+
+	* The "geometric information" in the problem instance, namely the
+	cinfo fields pts, full_trees and mst_length are now all entirely
+	optional!  They are only really used to plot FSTs in postscript
+	form.  Every other place where the code needs to access the
+	terminals contained in a given hyperedge now use the new cinfo
+	fields "edge", "edge_size" and "cost".
+
+	* Moved the Metric and data scaling fields from global variables
+	into the cinfo structure as fields metric, scale and scale_value.
+	Obsoleted the duplicate terminal group info, and added an
+	integrality_delta field to the cinfo.  In the future, this will
+	permit us to cutoff suboptimal nodes a bit sooner.
+
+	* Removed an enormous number of function prototypes from
+	steiner.h, either because they are obsolete, or because they were
+	moved elsewhere (bsd.h, genps.h, rfst.h, etc.).
+
+	* Introduced the new file machine.c to solve the problem of how to
+	get a machine description string.  It gets information that can be
+	obtained from the uname command.
+
+	* Reimplemented the routines in cpulimit.c to fix a bug and
+	increase the accuracy of the math by computing in hundredths of a
+	second.
+
+	* Completely recoded the get_cpu_time routine to correct some
+	significant errors in the math.  Also improved its efficiency
+	somewhat, especially on systems for which CLK_TCK is a function
+	call.  When doing UNIX_CPU_TIME, we now include <sys/time.h>,
+	<sys/times.h> and <time.h> to maximize the probability of finding
+	CLK_TCK in the system headers.
+
+	* Major rewrite of prelude.ps!  Now conforming to Adobe Document
+	Structuring Conventions version 3.0 (more or less).  Now defining
+	the plotting region to be such that terminals plotted at the
+	extreme edges of the plotting region will just graze the inside
+	edge of the framing box.  Also defining a clipping region so that
+	nothing crawls outside the box.  Now using arrays to hold all of
+	the terminal X and Y coordinates rather than defining zillions of
+	distinct words.  This prevents dictionary overflows that happened
+	previously on large point sets.  The "DefineTerminals" procedure
+	sets the number of terminals, and "DT" stores an X/Y coordinate
+	pair into the next element of the arrays.  Added dynamic scaling
+	of the X and Y axes via the SetAxes procedure.  Got rid of many
+	procedures: Term, Seg, Seg2, LightSeg, BackBone, BackBone2,
+	LightBackBone2 and ShadedRect.  The new drawing primitives
+	introduced are "T" (gets X and Y coords for a given terminal), "S"
+	(draws a line segment), "C" (draws a reclinear corner).  All
+	drawing primitives use whatever graphics state they are given --
+	no more "light" and "normal" versions of things!
+
+	* Renamed output.c to be genps.c to better indicate its function
+	-- generating postscript.  Major changes were made here.  Added
+	code to dynamically scale the axes of generated plots.  Started a
+	new naming convention: routines that generate COMPLETE PLOTS
+	(i.e., including BeginPlot ... stuff ... EndPlot) are now named
+	"plot_FOO".  Routines that emit postscript for an object that goes
+	inside a BeginPlot/EndPlot pair are named "draw_OBJECT".  The draw
+	routines no longer have "plot_lightly" flags.  It is up to the
+	caller to force the graphics state before invoking the particular
+	draw routine.  Now generating the new drawing primitives and other
+	procedures defined in prelude.ps.  Defining all of the terminal
+	coordinates in the %%BeginSetup section.  Now doing reasonable
+	things for non-geometric problem instances (i.e., don't try to
+	emit postscript plots for them... just dump data!).  Got rid of
+	the plotting of split_full_sets.  Got rid of all the horrible
+	cruft to try to adjust for FST generators that didn't do left-most
+	top-most Hwang topologies -- we now just draw the FST edge list
+	and be done with it!
+
+	* In io.c, made get_points really read from a given stream, and
+	return a dynamically allocated (and correctly sized) pset.  Also
+	made get_points return the scale factor and value, rather than
+	poking them into global variables.  Got rid of the
+	check_for_integral_coordinates routine and replaced it with a
+	somewhat more general init_output_conversion routine.  This
+	routine takes a point set, metric and scale as arguments, and
+	properly initializes the coord_t/dist_t to ASCII conversion
+	routines.  The state variables set up by this routine are now
+	known and accessed only inside this one file.  Now using feof on
+	the stream, rather than inventing a local flag to prevent further
+	reading at EOF.  Renamed the "struct slist" to be "struct
+	numlist", added a "num_dp" field for gathering scaling factor
+	info, and moved it into steiner.h.  Added two new entrypoints,
+	parse_line_of_numbers and read_numlist to support the new version
+	0 FST data file format.  Added a "find_newline" flag (as well as
+	the explicit stream) parameter to parse_one_number to support
+	parsing numbers up until a newline.
+
+	* Massive changes to p1read.c and p1write.c.  First to obsolete
+	the old version 0 and 1 formats, and introduce the new version 0
+	and 3 formats.  p1read.c now leaves cinfo members NULL if the file
+	didn't containt anything useful to put into those fields.  For
+	example, of the metric is PURE_GRAPH, then fields like
+	cinfo.full_trees will remain NULL.  Made p1write.c be more careful
+	about accessing these fields that could be NULL.  Now reading the
+	FST/hyperedge vertices into cinfo.edge, cinfo.edge_size and
+	cinfo.cost as well as into the full_sets (that is, if we have such
+	geometric info).  Compatibility info is now read into the
+	cinfo.inc_edges member instead of carray, incmasks, cmasks, etc.
+	p1write.c now gets the MST length from the cinfo, rather than
+	recomputing it (rectilinear style) from scratch.  p1read.c now
+	uses the new parse_line_of_numbers and read_numlist facilities to
+	permit mixing of integers and scaled reals on one line.  The
+	scaling of the hyperedge costs is deferred until all have been
+	read in as a linked list of struct numlist's.  p1read.c now uses
+	more efficient algorithms to process any compatibility info it
+	reads in and/or generates.  There is also no longer any need
+	generate the incmasks, cmasks, and term_tree_masks structures.  It
+	also has code to verify that the incompatible relation is
+	symmetric.
+
+	* Moved the MAX_COORD equate from steiner.h into rand_points.c,
+	the only place it was ever used.
+
+	* In bb.c, made cut_off_existing_nodes() be static.  Got rid of
+	concatenation terminal constraints, clique constraints, and
+	everything dealing with the obsolete submodular SEC separator.
+	Made check_for_better_IFS update the Z value with a more precise
+	value if the solution happens to be integral.  Got rid of
+	create_inc_fsets, since the inc_edges are now filled in by
+	p1read.c.  Added the experimental test_branching_variables
+	routine, to help determine a good branching variable when we see
+	one.  Also added the -R option (Check_Root_Constraints) to see how
+	fast we COULD be converging if we were smarter.  Added the @6
+	output containing Martin's statistics about the FST's comprising
+	the SMT.  Printing out the solution certificate ONLY if we have
+	geometric FST information.  Added a @0 output that contains the
+	description line from the FST data file.  Added % reduction
+	compared the the MST statistic to the @2 output line.  The -b
+	switch now DISABLES strong branching rather than enabling it -- in
+	other words, strong branching is now the default.  Eliminated the
+	-d and -m switches, which are now obsolete.  Added code to save
+	the LP solution history for each node.  Now printing special
+	messages to indicate when and which nodes are being suspended and
+	resumed.  New code to save and restore the LP tableax and basis
+	for each node.  Introduced the new update_node_preempt_value
+	routine to fix some misfeatures in the way the preempt_z was
+	updated.  Now using new macros instead of calling CPLEX's getbase
+	and loadbase routines directly.  Now printing out the number of
+	fractional variables for each LP solution.  The current node is
+	now cutoff immediately if the heuristic discovers a new upper
+	bound which can do so.  Now using the precomputed scale_value in
+	the cinfo rather than recomputing it when needed.  Now updating
+	the node_preempt_value when existing nodes are cutoff, just in
+	case ALL INACTIVE nodes got cutoff.  Recoded the deductive
+	variable fixing logic to use the new data structures (i.e.,
+	cinfo.edges, cinfo.inc_edges, etc.).
+
+	* In constrnt.c: implemented new save/restore/destroy node_basis
+	routines that replace the old binding_row stuff.  Eliminated
+	clique constraints and concatenation terminal constraints.
+	Massive rewrite of initialize_constraint_pool to conserve memory
+	and to eliminate references to huge data structures that went
+	away.  Now printing out the CPU time taken by init_constraint_pool
+	and both versions of build_initial_formulation.  Reworked the pool
+	representation to permit 65533 variables.  Simplified the pool's
+	hash table check so that the constraint RHS must match too --
+	otherwise a new constraint is always added.  This fixed many
+	potential bugs with modifying existing pool constraints (like
+	getting out of sync with the LP tableaux, and blowing up when
+	restoring nodes that we can't find all the UID's for).  Fixed
+	memory leak of rowvec in LPSOLVE version of
+	build_initial_formulation.  There is now only one version of
+	verify_pool.  Strengthened some consistency checks within
+	add_pending_rows_to_LP.  Using new macros rather than direct calls
+	to CPLEX's getbase/loadbase routines.  Added routines to get and
+	set the basis for lp_solve.
+
+	* In cutset.c, modified various routines to use cinfo.edge rather
+	than the FSTs, and also to eliminate compile-time limitations on
+	problem size.  Fixed "%lg" printf formats to be "%g".
+
+	* In sec2.c, removed compile-time problem size limitations and
+	changed a few names in some of the data structures.
+
+	* In sec_comp.c: removed the obsolete routines
+	find_congested_terminals and decompose_into_subcomponents.
+	Removed compile-time problem size limitations, and modified to use
+	latest data structures (i.e., cinfo.edge, cinfo.edge_size and
+	cinfo.cost instead of the FSTs).
+
+	* In sec_heur.c: Disabled the heuristic SEC flow separator when no
+	geometric information is present, due to its penchant for
+	computing geometric MSTs to drive its reduction.  Removed
+	compile-time problem size limitations.  Changed comments to say
+	hyperedge instead of FST or full set.  Renamed variables in this
+	way too.  Changed to use the latest data structures.  Made
+	find_integer_cycles (actually, its "cwalk" subroutine) more
+	intelligent about limiting itself -- it now crawls out of its
+	inner loops too.  Got rid of some of the arcane and commented out
+	stuff in find_small_subtours.
+
+	* Modified ub.c to use the new centralized disjoint-set union-find
+	code, as well as the new cinfo data structures.  Got rid of
+	compile-time problem size limitations.  Made compute_fstmst_index
+	do something reasonable for non-geometric instances.
+
+Tue Mar 17 22:04:20 1998  David Warme  <warme@s3i.com>
+
+	* Version 2.32.  This is the version that is presented in my
+	dissertation.
+
+	* Fixed several bugs in the CPLEX version 3.0 code that were
+	reported by Martin Zachariasen.  These were all in the 3.0
+	versions of the macros in bb.h
+
+	* Moved all of the BSD stuff out of coarse.c and into a new file
+	bsd.c.  This includes routines to precompute the BSD matrix,
+	retrieve the BSD for a pair of terminals, and the
+	full_topology_edge_too_long routine.
+
+	* Added call of compute_mst_longest_edges to rstprune.c.
+
+	* Added declarations for bottleneck_distance and
+	bottleneck_mst_length to steiner.h.
+
+	* Added new file bmst.c to compute MST's using BSD metric.
+
+	* Added empty rectangle checks to the FST screening tests in
+	fine.c.  These are done unless Disable_New_Tests is set.
+
+	* Added BMST check to the FST screening tests in fine.c.  This
+	test is done unless Disable_New_Tests is set.
+
+	* Added BMST of union check to compatibility tests in compat.c.
+	This test is done unless Disable_New_Tests is set.
+
+	* Added kahng_robins of union check to compatibility tests in
+	compat.c.  This test is currently disabled because it is too
+	slow.  Otherwise it is done unless Disable_New_Tests is set.
+
+	* Added -o switch to prep.c and redg.c to do FST screening and
+	compatibility checks the old way by setting Disable_New_Tests.
+
+	* Complete replacement of ub.c with an entirely new method
+	suggested by Martin Zachariasen.  It is a greedy method very
+	analogous to Kruskal's MST algorith, adapted to hypergraphs.
+
+	* Added new ub.h file to define the interfaces for the new ub.c
+	implementation.
+
+	* Added fstmst_index field to the bbinfo structure.  This holds
+	precomputed info used to speed up the upper bound heuristic.
+	Called compute_fstmst_index from branch_and_cut in bb.c to
+	initialize this data structure, and freed it when done.
+
+	* Freed bbinfo.dj and bbinfo.slack in bb.c.
+
+	* Changed printf format %lf to be %f in two places in bb.c.
+
+	* Enabled the call to compute_heuristic_upper_bound, since it is
+	much more efficient now, and it actually works.
+
+	* Added the new_upper_bound routine to bb.c and bb.h.  This
+	routine takes care of all the details whenever a new upper bound
+	is achieved, such as setting the LP solver cutoff value, cutting
+	off suboptimal nodes, and printing the @UO and @UN messages that
+	include both the bound and the gap percentages.  Calling this
+	routine now instead of inline code, wherever appropriate -- in
+	both bb.c and ub.c.
+
+	* Modified the printing of @LO and @LN lower bound messages to
+	include the gap percentage as well as the bound.
+
+	* Added a cycle-detection limit to find_integer_cycles (and its
+	recursive subroutine cwalk).
+
+Tue Sep  2 17:54:21 1997  David Warme  <warme@s3i.com>
+
+	* Version 2.31.  This is the version that was presented at ISMP97
+	in Lausanne, Switzerland (August 24-29, 1997).
+
+	* Added the -r switch to plot the optimal LP relaxation for the
+	root node, but only if it is fractional.
+
+	* Implemented garbage-collection of the constraint pool.  The new
+	SEC separation procedure is very prolific at generating lots of
+	very big constraints.  Since rows were NEVER deleted from the
+	constraint pool, we were rapidly running out of virtual memory.
+	When adding new constraints to the pool, we make room by deleting
+	rows in ascending order by "effectiveness" -- which is a
+	combination of how recently the row has been binding and how much
+	space it consumes.
+
+	* Added the "iter", "initrows", "hwmrow" and "hwmnz" fields to the
+	constraint pool structure to support the garbage collection
+	mechanism.  The "iter" field counts "solve_single_LP" operations
+	and is used to remember how recently various constraints were
+	binding.  The "initrows" field indicates the number of initial
+	rows in the constraint pool.  We NEVER delete such rows, since we
+	do not necessarily have separation routines that could recompute
+	them if needed.  The "hwmrow" and "hwmnz" fields record the
+	all-time high-water-mark for rows and non-zero coefficients
+	respectively in the LP tableaux.  The size limit for the
+	constraint pool is set to be a fixed multiple of these.
+
+	* Added "biter", "hval", "flags", "uid" and "refc" fields to each
+	row in the constraint pool to support the garbage collection
+	mechanism.  The "biter" field records how recently the constraint
+	was binding.  The "hval" field makes it easier to unthread the
+	constraint from the hash table when deleting it.  The "flags"
+	field (containing the RCON_FLAG_CLIQUE and RCON_FLAG_DISCARD bits)
+	is for managing clique constraints.  The "uid" field is a unique
+	ID so that we can find constraints even when their absolute index
+	within the pool changes because of row deletion and garbage
+	collection.  The "refc" field is a reference count giving the
+	number of INACTIVE nodes for which the constraint was most
+	recently seen to be binding.  Constraints having a non-zero
+	reference count are prohibited from being garbage-collected, since
+	that would likely cause a digression in the objective value of the
+	inactive node.  We could not guarantee finite termination of the
+	algorithm if this happens.
+
+	* Each (inactive) branch-and-bound node now contains a list of the
+	UID's of those constraint pool rows that were binding at the time
+	the node became inactive.  When we reactivate the node this lets
+	us decrement the reference counts for these constraints.
+
+	* Added recovery from CPLEX's annoying CPX_OPTIMAL_INFEAS errors.
+	This error code means that it found an optimal solution to the
+	scaled problem, but that the solution violated one or more
+	feasibility tolerances (row, bounds or reduced cost) after being
+	unscaled.  Supposedly this error code cannot happen if scaling is
+	turned off.  (Actually, it still can if the objective coefficients
+	are sufficiently large...)  Turning scaling off all the time slows
+	CPLEX down by 40-50%.  Instead we leave scaling turned ON but
+	when the error code happens we turn scaling OFF re-optimize record
+	the solution and then turn scaling back ON.  Unfortunately, the
+	only way to toggle scaling is to COMPLETELY DISCARD the current
+	problem, flip the scaling indicator, and RELOAD the entire problem
+	from scratch!  This is a real pain in the butt!  Fortunately it
+	does not seem to take too much time, and occurs quite rarely in
+	practice.
+
+	* Avoid bombing out in try_branch if CPLEX reports a
+	CPX_OPTIMAL_INFEAS error.
+
+	* Added slack_size, slack, and dj members to the bbinfo
+	structure.  We now ALWAYS obtain the slacks and the reduced costs
+	after solving every LP.  Querying these later can cause problems
+	if we had to turn scaling off/on because CPLEX does not have a
+	solution available after doing this -- making such queries bomb.
+
+	* Added new files clique.c and clique.h for greedily finding
+	ever-larger violated cliques of incompatibility constraints and/or
+	2-terminal subtours.  Although these constraints may decrease the
+	total number of LP/separate cycles by a small amount, they
+	actually slow down the LP solver enough to create a net LOSS in
+	speed.  This separator is therefore OFF by default.  Specifying
+	the -c switch turns it on.
+
+	* Added "concatenation terminal constraints" to the initial
+	constraint pool.  Although these constraints may decrease the
+	total number of LP/separate cycles by a small amount, they
+	actually slow down the LP solver enough to create a net LOSS in
+	speed.  Therefore, these constraints are turned OFF by default.
+	The -C switch must be specified to include them.
+
+	* Added the "inc_fsets" and "fset_concat_terms" fields to the
+	cinfo structure.  The "inc_fsets" field represents the
+	"incompatibility graph" as adjacency lists.  The
+	"fset_concat_terms" field encodes the list of concatenation
+	terminals (if any) discovered by the front-end.
+
+	* Modified read_version_2 to read AND STORE the concatenation
+	terminals info from the front-end.
+
+	* Modified read_version_2 to FORCE all FSTs having 2 or more
+	terminals in common to be incompatible.  The phase 1 data no
+	longer needs to have these incompatibilities listed explicitly,
+	which significantly reduces the size of the phase 1 data.
+
+	* Removed various memory leaks from the branch_and_cut routine.
+
+	* Added the "free_phase_1_data" routine to get rid of the huge
+	memory leak reported by the "purify" tool.
+
+	* Added the "free_constraint_pool" routine to get rid of the big
+	memory leak reported by the "purify" tool.
+
+	* Added the "bbheap_free" routine to get rid of the memory leak
+	reported by the "purify" tool.
+
+	* add_constraint_to_pool now reduces EVERY constraint by dividing
+	all of the coefficients by their GCD, just in case...
+
+	* Setting the RCON_FLAG_CLIQUE flag for every constraint added
+	that has the form of a "clique" constraint (i.e. all non-zero
+	coefficients are 1, op/rhs are "<= 1").
+
+	* No longer assuming the coordinates are scaled to integer values
+	without first checking!  The "check_for_integral_coordinates"
+	routine performs this check.  This affects not only the reading of
+	phase 1 data, but also the "kr", "prep" and "redg" programs.
+
+	* Made *MAJOR* modifications to output.c so that we can plot
+	rectilinear FSTs "nicely" (i.e. as Hwang topologies having a
+	backbone and 0 or more legs) even when the terminals and Steiner
+	points are randomly ordered by the front-end.  The old method
+	assumed that the terminals and Steiner points were in the
+	meticulous order that "prep" forces.  There is also a lot of
+	sanity checking for cases in which the rectilinear FST is
+	obviously wrong.  Finally, a comment is emitted indicating any FST
+	that is a Hwang topology but whose vertical backbone leg lies to
+	the right of the horizontal backbone leg -- these are the
+	"corner-flipped" versions of what "prep" produces.
+
+	* Modified plot_single_fractional_full_set to plot all integral
+	FSTs "normally" -- that is as either rectilinear or Euclidean
+	FSTs.  This makes it a bit easier to tell which FSTs are truly
+	integral when looking at plots of LP solutions.
+
+	* Modified find_small_subtours to avoid checking for 2-terminal
+	subtours if they were included in the initial constraint pool.
+
+	* Fixed nasty bug in find_integer_cycles (actually in its "cwalk"
+	subroutine) wherein nested loops both controlled the same variable
+	"i".
+
+	* Fixed a memory leak in split_connected_components.
+
+	* Fixed memory leaks in build_heuristic_SEC_formulation.
+
+	* Fixed memory leak in find_integer_cycles.
+
+Thu May 22 01:03:21 1997  Dave Warme  <warme@s3i.com>
+
+	* Version 2.30.  This is the version that was shipped to C. K.
+	Wong (executable only -- no source code).
+
+	* Replaced sec.c and sec.h (the submodular SEC separator) with
+	new files sec2.c and sec2.h -- the new deterministic SEC separator
+	that uses min-cut on a bipartite graph.
+
+	* Moved the routines check_component_subtour,
+	component_terms_to_real_terms, and find_least_congested_terminal
+	from sec.c/sec.h into sec_comp.c/sec_comp.h, since these routines
+	are used by both the old and the new separator.  Removed sec.o
+	from the link for program "bb", thus obsoleting it.
+
+	* Disabled several of the more voluminous messages from the
+	output of "bb".
+
+	* Modified add_constraints to return the actual number of distinct
+	constraints added to the constraint pool.  On the "Node N LP K"
+	messages, we are now displaying this number instead of the number
+	of "logical" constraints found.
+
+	* Made add_constraint_to_pool be static, since it is now called
+	only from within constrnt.c.  It now returns a bool that is TRUE
+	if-and-only-if the constraint was newly-added to the constraint
+	pool.
+
+	* Added conditionals to choose between the old and new SEC
+	separation routines.  (We use the new one!)
+
+	* Fixed a scaling bug in the code that prints out the @LO and @LN
+	lower bound messages.
+
+	* Commented out the call to build_cutset_separation_formulation.
+	Since the actual separation code is already commented out,
+	building the flow network is just a good way to waste memory!
+
+	* Removed the inclusion of art.o in the building of "prep".
+
+	* Performed major rennovations on the README file.
+
+Thu May 15 08:14:55 1997  Dave Warme  <warme@s3i.com>
+
+	* Version 2.20.  This is the version that was presented at the
+	INFORMS conference in San Diego on May 4-7, 1997.
+
+	* Modified do_separations (and sec.c) to determine whether or not
+	the optimal value of the LP relaxation has been attained.  This
+	cannot be known for sure if any large congested components were
+	skipped by the submodular SEC separator.
+
+	* Modified CPLEX version of "add_pending_rows_to_LP" to reallocate
+	the CPLEX problem (actually, to rebuild it from scratch) if the
+	problem becomes too large.
+
+	* Now destroying main LP tableaux in branch_and_cut when done.
+
+	* Moved both the lp_solve and CPLEX versions of
+	build_initial_formulation from bb.c into constrnt.c.  Also added a
+	destroy_initial_formulation routine to support the reallocation of
+	the CPLEX main LP.
+
+	* Modified to support both CPLEX version 3.0 and CPLEX version
+	4.0.  These are now distinct Makefile options.
+
+	* Added the -2 switch to bb, which disables the addition of the
+	2-terminal subtours to the initial constraint pool.
+
+	* Modified plot_single_full_set and
+	plot_single_fractional_full_set to include the full set numbers,
+	as well as the terminal numbers in the comments they generate.
+	Also modified plot_lp_solution to skip full sets whose weights are
+	very nearly zero.  Fixed plot_single_fractional_full_set to not do
+	rounding when computing the hub location -- doing so is very bad
+	if the coordinates have not been scaled up to integer values!
+
+	* Created a stand-alone "rstprune" program, which reads in the
+	phase 1 data, prunes the full sets, and writes out updated phase 1
+	data.
+
+	* Modified the SEC decomposition stuff to work on congested
+	components.
+
+	* Modified the amount of partial enumeration performed.  Will
+	check all 5-SECs on congested components of up to 20 terminals,
+	and all 3-SECs on congested components of up to 30 terminals.
+
+	* The check for integer feasible solutions is now distinct from
+	the integer cutset code.  The integer_feasible_solution routine
+	first checks for fractional variables, since these are likely to
+	be found quickly.  Only when all variables are found to be
+	integral does it check connectivity (with special code).
+
+	* The inter cutset separator is now called by do_separations.
+
+	* Fixed a bad bug in the loop that passes congested components to
+	the submodular SEC separator.  Not only did it pass only the first
+	congested component, but it memory leaked the rest!
+
+	* Also corrected the check for any constraints discovered before
+	going on to the submodular SEC separator.  There were numerous
+	cases where constraints were found, but control still passed on to
+	the submodular SEC separator.
+
+	* Commented out the call to the fractional cutset separator.  This
+	routine is far too slow (10 CPU minutes on 1000 point rectilinear
+	problem!) to be useful.  It will stay disabled until I have time
+	to get the cutset reductions finished.  (These reductions merge
+	all of the terminals of each integral full set, collapsing the
+	problem down to something much smaller to separate.)  Stay
+	tuned...
+
+	* Added @L output messages so that we can track how the lower
+	bound changes over time.
+
+	* Added @NC output messages to indicate node creation.
+
+	* Do not create any nodes that already meet or exceed the cutoff
+	value!
+
+	* Added the collection of numerous constraint statistics:  number
+	of pool rows/non-zeros, LP tableaux rows/non-zeros.  These are
+	collected 1) initially, 2) for the root node, 3) at completion.
+	Also recorded the number of minsubmod's needed for the root node,
+	and whether or not the root node was LP-optimal.
+
+	* Now printing out all command line arguments at the start of
+	every run.  This makes it easier to reproduce results of previous
+	runs.
+
+	* Now printing out a certificate of the solution on the @C lines.
+	This is simply the X/Y coordinates for each Steiner point.
+
+Thu Apr  3 01:11:47 1997  Dave Warme  <warme@s3i.com>
+
+	* Fixed nasty bug in decomp.c that caused old_bs to take more than
+	30 CPU minutes on the "rand_points 65" problem instance when using
+	version 2 of the phase 1 data.  This instances takes only about 2
+	CPU minutes for the version 0 data!  The actual problem was that
+	when solving the "forest" subproblem of the cycle-busting
+	decompositions, the code computed new compatibility data FROM
+	SCRATCH!  Since the version 2 data does not preserve the backbone
+	"style" field, this was obtaining only basic compatibility
+	information (and it wasn't even doing any pruning!).  The
+	resulting loss of incompatibilities caused the backtrack search to
+	take forever.  Even if the backbone style information were
+	retained, this would still depend on the rectilinear metric.  We
+	now properly create new compatibility data by editing the new
+	"fake" full set into a copy of the matrix.
+
+	* Fixed a nasty bug in p1write.c -- a problem doing the
+	indentation for the list of full sets incompatible to the current
+	one.  Having an "if" instead of an "else if" caused the first full
+	set on lines 2 through N to be a duplicate of the last one on the
+	previous line.  This would normally cause an "Unexpected EOF!"
+	when trying to read the phase 1 data back in.
+
+	* Moved the CPU time limiting code off into a separate cpulimit.c
+	file.  It is now used consistently by the kr, old_bs, and bb
+	programs.
+
+	* Modified old_bs.c to no longer assume any particular sorted
+	ordering of the full sets.  It performs this sorting itself and
+	remaps the results back to the initial ordering.  All 15 of the
+	estein250.txt Euclidean problems have been solved using this
+	backtrack search.  (One of these problems took more than 10 CPU
+	days!)
+
+	* Commented out a bogus "fatal" check in the cycle-busting
+	decomposition.  It turns out that it is perfectly VALID to have a
+	forest solution be longer than the corresponding tree solution!  A
+	decription of the circumstances under which this happens has been
+	added to the code for historical purposes.  We must also not
+	assume that tree_len - forest_len is non-negative, but actually
+	find the largest such delta -- even if it happens to be negative!
+
+	* Major speedup of the rectilinear full set generator!  Added code
+	to gensets.c to cutoff the recursive enumeration of topologies
+	whenever a backbone segment would be generated that violates the
+	"point too close" screening test.  The number of generates FSTs
+	dropped from exponential to O(n^2) in one swell foop!  The overall
+	empirical growth of the front-end now appears to be O(n^3)!
+
+	* prep.c now accepts the -n switch (no pruning) as well as -t
+	(display phase timings).
+
+	* Split p1io.c into separate p1read.c and p1write.c files.  This
+	is because most programs need to either read or write the phase 1
+	data, but not both.  This cleans up the resulting object file
+	dependencies considerably.  Also moved the hex-floating-point
+	conversion code into these two new files.
+
+	* Made reading of version 2 data force the "never needed" FSTs to
+	be incompatible with all others.
+
+	* Omitted the "never needed" full sets from the incompatible lists
+	when writing version 2 data.
+
+	* A large number of subroutines were moved to different files in
+	order to improve the partitioning of the code.  Files now contain
+	exclusively either 1) front-end code, 2) backtrack
+	search/decomposition code, 3) branch-and-cut code, or 4) utility
+	routines used by most of the above.
+
+	* Split all initial_pruning code out of compat.c and into the new
+	prune.c file.  Also modified initial_pruning to fix up the bitmask
+	versions of the compatibility info after pruning has finished.
+
+	* Created new "fsplot" program.  It reads in the phase 1 data and
+	produces the -a, -f, -g, -o, -r, and -s plots, just as old_bs
+	previously did.  Note that the "relief plots" (-r) only work on
+	version 0 or 1 data, since it requires "backbone style"
+	information, which is not present in the version 2 data format.
+
+	* Did major repairs on the algorithms for identifying integral
+	cycles, and "almost integral" cycles.  The previous algorithms did
+	not properly recognize all cycles that were "almost integral"
+	(i.e. integral except for a single fractional full set).  The new
+	algorithm should find them all.
+
+	* Used my find_congested_components stuff to "clean up" the
+	constraints discovered by the submodular SEC separator.  Many of
+	the constraints that it produces have terminals hanging off them
+	that do not change the magnitude of the violation, yet aren't
+	really part of the subtour.  Such terminals substantially weaken
+	the constraint.  In some cases a large SEC will decompose into two
+	completely disjoint (but much stronger) constraints.  I think this
+	will help alleviate some of the "SEC thrashing" wherein multiple
+	costly iterations of the separator make little progress on the
+	objective function.
+
+	* Implemented a signal handler for "kill -15" that causes the
+	submodular SEC separator to abort.  If no constraints have been
+	seen yet, this will cause a branch to be taken.  Using this
+	capability and some manual "kill -15" intervention, I was finally
+	able to solve the remaining estein1000 Euclidean problems.
+
+	* Added "-m N" switch to bb.c.  This limits the submodular SEC
+	separator to congested components of at most N terminals.  With a
+	reasonable choice of N, all of the estein1000 Euclidean problems
+	solve relatively quickly with no manual intervention.
+
+	* Added the -b switch to bb.c.  This switch enables "best choice"
+	branching (i.e. strong branching), which tries both Xi=0 and Xi=1
+	branches of each fractional variable Xi before deciding which one
+	to branch on.  A branch is "tried" by using it on the current LP
+	tableaux (not the entire constraint pool).  The variable that
+	produces the best "one-branch-no-cuts" improvement in the bound is
+	selected.  Any variable that produces a cutoff along BOTH branches
+	is selected immediately, without checking the remaining fractional
+	variables.  Each resulting LP solution is checked to see if by
+	some miracle it happens to be an integer feasible solution.  This
+	is actually now the most common place where integer feasible
+	solutions are discovered!  The lp_solve_2.0 version of this is
+	very efficient.  The CPLEX version is currently much less
+	efficient (since I don't have this kind of access to its internal
+	state information), but still very worthwhile on medium to large
+	problems.
+
+	* Hacked lp_solve_2.0 to provide extremely efficient support for
+	strong branching in that the basis is refactored ONLY ONCE at the
+	very start.  Each trial branch pivots only until optimal,
+	infeasible, div-by-zero, or another refactorization would be
+	attempted.  The basis is restored and the eta-vectors TRUNCATED
+	back to their initial state.
+
+	* Implemented deletion of slack rows on the main LP.  This was a
+	MAJOR performance win.  It turns out that about 90% of all
+	constraints I was using were SLACK at any given time.  (Most of
+	these were NEVER binding.)  The only thing such constraints do is
+	bog down the LP solver.  It is important, however, to not "forget"
+	about any such row that is deleted.  I implemented this as
+	follows:
+
+	* There is a new "constraint" pool" which is distinct from the LP
+	tableaux.  Constraints in the pool are represented as raw
+	coefficient rows -- not "logical" constraints (i.e. SECs, cutsets,
+	etc).  These rows are quite compact since they are stored with
+	shorts, not doubles.  Their structure is also independent of the
+	LP solver, which makes it a bit easier to support multiple LP
+	solver packages.
+
+	* When adding new constraints to the pool, a hash table is used to
+	determine if the constraint is already present.  The hash function
+	operates only on the LHS of the constraint, not the operator or
+	RHS because it is possible that a new constraint has the same
+	LHS/operator, but a TIGHTER RHS -- in which case the existing pool
+	entry is tightened.
+
+	* Each constraint in the pool can be either a) not present in the
+	LP tableaux, b) presently in row K of the LP tableaux, or c)
+	pending addition to the LP tableaux.
+
+	* The constraint pool is initially "seeded" with the total-degree
+	constraint, the 1-terminal cutsets, and the incompatibility
+	constraints.  The total-degree constraint and the cutsets are made
+	pending.
+
+	* The LP tableaux is constructed from the "pending" entries of the
+	initial pool, at which point they transition to the "present at
+	row K of the LP tableaux" state.
+
+	* A single "Solve_LP_Over_Pool" operation involves iteratively
+	solving the present LP tableaux and the scanning the pool for rows
+	that are violated.  All such rows are added to the LP tableaux and
+	reoptimized.  The process terminates when the LP solution
+	satisfies all constraints in the pool.  (No rows are deleted from
+	the LP tableaux during this process.)
+
+	* After obtaining the optimum over the current pool, the rows of
+	the current LP tableaux are examined.  If a sufficient number are
+	slack (>=10% for CPLEX, >= 1 for lp_solve) then all of the slack
+	rows are deleted from the tableaux.  (The state of each pool entry
+	is updated appropriately.)
+
+	* Any constraints discovered by the separation procedures are then
+	added to the pool and marked "pending".
+
+	* All "pending" constraints are added to the LP tableaux (with
+	proper updating of state for each pool entry.)
+
+	* Added get_slack_vars to lp_solve_2.0 to make it easier to
+	determine which rows are slack.
+
+	* Added delete_row_set to lp_solve_2.0 to permit a set of rows to
+	be deleted efficiently.
+
+	* Modified various programs to implement "node preemption".  Under
+	this scheme, processing for a node (i.e. cut generation) is
+	suspended as soon as it is no longer the node with the lowest
+	objective function value.  We say that the node is "preempted" in
+	favor of another.  Processing of the preempted node resumes as
+	soon as it becomes the "lowest Z" node.  Under this change, node
+	numbers are now assigned in order of NODE CREATION, not node
+	destruction.
+
+Tue Jan  7 10:42:46 1997  Dave Warme  <warme@s3i.com>
+
+	* Version 2.10.
+
+	* Modifications to support the V2 data format as agreed upon with
+	Martin Zachariasen.
+
+	* coord_t and dist_t changed from int32u to double!  This required
+	substantial changes to the routines in io.c for converting these
+	into printable ASCII, as well as other substantial changes to
+	other files.
+
+	* Now computing and storing a graph with each full set (as a list
+	of edges).  This permits plotting of full sets with less
+	understanding of the particulars of the current metric.
+
+	* Added full support for duplicate terminals (except for the redg
+	program).
+
+	* Added full support for "required full sets" discovered by the
+	front end.
+
+	* Made the phase 1 I/O stuff to pass the initial tmap,
+	fset_mask and required_fsets as members of cinfo rather than as
+	separate parameters.  Also added the description and phase 1 CPU
+	time to the cinfo.  The phase 1 I/O stuff now reads in the phase 1
+	CPU time (if present).
+
+	* bb now uses the description field from the data file in the plot
+	label.
+
+	* Fixed a minor bug in branch_and_cut wherein the LP variable
+	bounds were not being set for variables that start off fixed.
+	This may be causing us more work than we need in some cases.
+
+	* The initial LP instance now correctly handles terminals that are
+	deleted due to duplicates.  Missing terminals caused an incorrect
+	RHS for the total degree constraint as well as fatals from
+	generating the "wrong" number of rows.
+
+	* Fixed a bug in coarse.c okay_pair routine that happens when
+	terminals are missing from tmap.
+
+	* Modified build_compatibility_data to initialize the description
+	and p1time fields of cinfo.  Also made init_compat_bitmasks and
+	init_term_trees non-static for use by the new p1io stuff.
+
+	* Added the new Metric global variable.
+
+	* Modified fine.c to build the full set graph as a list of edges
+	that gets saved in the full set if all tests are passed.  Other
+	code in this file was simplified with such data available.
+
+	* generate_duplicate_full_sets was replaced with
+	generate_duplicate_terminal_groups.  There is no reason to build a
+	full set for these guys anymore.  Modified other code in gensets
+	to copy the new full set graph into generated full sets.
+
+	* Modified io.c to print distances and coordinates in a metric
+	sensitive way.  Euclidean metric should always print these with
+	high precision (unless values are integral), since the Steiner
+	points are irrational in general.  The code is also careful not to
+	put an annoying decimal point on rectilinear coordinates when the
+	problem data are integral.
+
+	* Changed minimum spanning tree stuff to use arrays that are
+	allocated at the required (rather than worst-case) size.  Also
+	changed some variable names that violated a few conventions.  Made
+	mst_length be non-static for use by the p1io stuff.
+
+	* Fixed a bug that has been in the Kahng-Robins (kr_main) code
+	forever -- namely the setting of the mark bits was done with i and
+	j (which are actually out of range) rather than with best_i and
+	best_j.  This was seldom a problem because of the worst-case
+	memory allocation that was being done.
+
+	* Modified old_bs.c to use duplicate terminal groups rather than
+	the old trivial full sets stuff, and to let the p1io stuff read
+	the phase 1 CPU time.
+
+	* Modified output.c to plot full sets using the new full set edge
+	lists.  Some minor metric-dependent code is still required for
+	various reasons.
+
+	* MONSTER changes to p1io.c to handle the new V2 data format!
+
+	* Modified prep.c to accept a description field using -d "text".
+	The version number of the data generated is also now also
+	specifiable using -v number.  (Defaults to the latest).  Also
+	modified to use the new duplicate terminal groups stuff.  Modified
+	to handle the required full sets stuff -- even though the
+	rectilinear front-end does not yet discover any.  Now letting the
+	p1io stuff print the phase 1 CPU time.
+
+	* Minimal changes to redg.c to use the duplicate terminal group
+	stuff (and complain bitterly if any are detected!).
+
+	* Modified full_set_mst in sec_heur.c to "right-size" the memory
+	allocation rather than using worst-case local arrays.
+	MAX_TERMINALS * MAX_TERMINALS * sizeof(struct edge) is not
+	something you should be placing on the stack anymore!
+
+Tue Nov 19 20:01:00  David Warme  <warme@s3i.com>
+
+	* Version 2.00.
+
+	* Cleanup prior to release.
+
+	* Made an industrial strength README file that includes
+	information on how to reach me, directions on building the
+	software, description and user documentation on each program, and
+	an overview of the various source code files.
+
+	* Renamed and reorganized several files.  For example, "lp.c" is
+	now a bad name -- not just because it clashes with the system
+	print job spooler command, but because it has become much more
+	than an experimental LP relaxation of an untested IP formulation.
+	It is now a complete branch-and-cut solver!  Unfortunately, the
+	name "bc" is already taken, so I have renamed "lp.c" to be "bb.c"
+	-- for branch-and-bound.
+
+	* Since the program "main.c" is no longer my "main" program, I
+	have renamed it "old_bs.c" -- old_bs can mean a number of things,
+	including "old backtrack search."
+
+	* More than the name of "lp.c" changed -- it was overly huge and
+	failed many of the cohesion tests.  Split off the general
+	constraint routines into "constrnt.c".  Split off all of the
+	cutset separation routines into "cutset.c".  Sprouted a new
+	"cutset.h" file.  Moved all other SEC separation code into
+	"sec_heur.c", including the total and partial enumerations.
+
+	* Modified p1io.c to include a version number within the phase 1
+	data and to handle backward compatibility with old version data
+	files.  The phase 1 CPU time is no longer an optional component of
+	the phase 1 data.
+
+	* Created this ChangeLog file from the README files of the older
+	versions.
+
+Mon Oct 14 01:23:24  David Warme  <warme@s3i.com>
+
+	* version 1.16.
+
+	* The first heuristic SEC separation routine has been flushed.  It
+	built a flow graph once at entry to the branch-and-cut and used
+	the same flow graph for every separation problem.  The assumption
+	was that it would be too expensive to construct this graph on the
+	fly.  The assumption has turned out to be wrong.  We now use only
+	the "second" heuristic that custom builds a flow graph that is
+	appropriate for the given SEC component.
+
+	* Added initial implementation of decomposition for the SEC
+	separation problem.
+
+	* Modified the order and manner in which the various separation
+ 	routines are applied.  We no longer stop separating the moment one
+ 	of the routines finds a violation.  Now we apply almost all of the
+ 	less costly separators on (almost) every LP solution.  (The
+ 	integer cutsets separator is the sole exception, due to its other
+ 	role of checking for integer feasibility.)  Most of the SEC
+ 	separators are now invoked on a per-component basis.  Finally,
+ 	components that do not exceed a fixed size are separated by total
+ 	enumeration and not using any of the other separation routines.
+  	This new deployment of the separators is controlled by a new
+ 	"do_separations" routine.
+
+	* The current methods used to decompose LP solutions into smaller
+	components prior to SEC separation are:
+
+	* Iterative removal of uncongested terminals -- those that have
+ 	total connection weight <= 1.
+
+	* The problem is partitioned into its disjoint connected
+ 	components.  Each gives rise to an independent SEC separation
+ 	component.
+
+	* The components are again split into their biconnected
+ 	components, since no subtour across BCC's can happen without at
+ 	least one violation within one of the BCC's.  By converse
+ 	argument, no SEC violation exists if every BCC is free of SEC
+ 	violations.  Note that terminals that were congested prior to
+ 	partitioning into BCC's may become uncongested afterward, which
+ 	can give rise to further reductions.
+
+	* Long chains of integral two-terminal full sets get "compressed"
+ 	by merging all of the middle terminals into one.  The current
+ 	implementation of this method is a quick hack -- not very
+ 	flexible.  Its results in practice are likewise weak.  This can
+ 	probably be improved by handling multiple fractional full sets
+ 	whose weight sum to 1.  The full solution is to use compatibility
+ 	to split into components -- and a much more complicated
+ 	combinatorial method to look for inter-component violations when
+ 	none occur within any one component.
+
+Sat Oct  5 23:18:48  David Warme  <warme@s3i.com>
+
+	* version 1.15.
+	* The big news for this version is the real separation procedure
+	for the generalized Subtour Elimination Constraints.  Although
+	quite slow, it makes a dramatic speed difference just because the
+	root LP is now so tight that branching is not needed for most
+	problems!  Unfortunately, the LP problem instances generated by
+	the SEC separator become very degenerate or near degenerate as the
+	polymatroid approaches optimal -- which totally blows lp_solve_2.0
+	out of the water.  It takes a much better LP solver than this to
+	get anywhere.  Even CPLEX bogs down noticeably on these problems.
+
+	* Limited the subtour enumeration routine to check only PAIRS of
+ 	terminals, since enumerating triples loses relative to invoking
+ 	the new SEC separator.  On average this general SEC separator
+ 	obtains much better constraints even though it can take longer.
+
+	* Fixed an unset variable in the max-flow solver.
+
+	* Fixed a "window" in lp_solve_2.0 caused by two IF's that did not
+ 	agree -- needed to add an epsilon to one.
+
+	* Fixed a problem with use of "offsetof" macro in io.c that is
+	only caught by some compilers.
+
+	* Changes required for port to the DEC Alpha:
+
+	* Moved big arrays off the stack and onto the heap in mst.c and
+ 	prep.c.  (Needed for Alpha, which has a small stack by default.)
+
+	* Fixed scanf format in p1io.c to use correct data size.  (Needed
+	by DEC Alpha on which sizeof(short) < sizeof(int) < sizeof(long).)
+
+	* Improved the integral subtour finder to also look for cycles
+ 	that are integral except for a single fractional edge.  As
+ 	currently coded, numerous violations of this type go UNDETECTED.
+  	Expect some improvement in this area next time...
+
+	* Disabled the heuristic method for obtaining upper bounds.  At
+ 	the moment this heuristic does nothing but make the program run a
+ 	bunch slower.
+
+	* Added code to compute a "Closest Rational Approximation" of a
+ 	floating point number.  This greatly cleans up the numeric noise
+ 	in solutions coming from the LP solver.  It is also used inside
+ 	the SEC separator.
+
+	* Moved the "find_congested_terminals" routine into new sec.c
+ 	file.
+
+	* Added lots of new debugging code -- much of it used to track
+ 	down the numeric stability issues with lp_solve_2.0.
+
+
+	* Added -bin, -reset, and -inv N arguments to the "lp_solve"
+ 	stand-alone solver.  Also made it able to print big LP problem
+ 	instances.
+
+	* Added new dump_lp and load_lp routines in lpbinio.c to permit LP
+ 	problem instances to be ported between machines (assuming IEEE 754
+ 	floating point format) without losing any precision.
+
+	* Added some stand-alone utilities in the lp_solve_2.0 directory
+	(foo.c, bar.c, and baz.c naturally) for doing stuff with these
+	binary LP instances.
+
+	* Added some debugging code to lp_solve_2.0, and fixed the passing
+	of the number "10" to the "pow()" routine, which expects a double.
+	(Not all systems provide a prototype for "pow()" in <math.h>.)
+
+	* Improved the testing for suspicious rounding, and the
+	information that is printed when such rounding occurs.  (Basically
+	debugging code...)
+
+Mon Aug  5 19:57:02 1996  David Warme  <warme@s3i.com>
+
+	* version 1.14.
+
+	* Several programs that were part of the old manual IP solving
+ 	methodology have been obsoleted: cycle, ip, ipcutset, ipcycle, and
+	prip.  Getting rid of "ipcutset" also permits the future
+	splitting-off of the various cutset constraint separators into a
+	new "cutset.c" file with less confusion...
+
+	* The "sec.c" and "sec.h" files have been renamed "sec_heur.c" and
+ 	"sec_heur.h", to make room for the real SEC separation procedure,
+ 	which is next on the list of things to do.
+
+	* The names of the various heuristic SEC separation routines and
+ 	data structures have been renamed to indicate their heuristic
+ 	nature.
+
+Mon Aug  5 18:28:41 1996  David Warme  <warme@s3i.com>
+
+	* version 1.13.
+
+	* The code now supports two different LP solver packages via
+ 	Makefile options: 1) CPLEX, one of the best LP solvers on the
+ 	planet.  2) lp_solve_2.0, a simple shareware trinket.  Source code
+ 	for this package (including some of my own bug fixes and
+ 	enhancements) is included in this distribution.  This is a very
+ 	important improvement -- the code is no longer shackled to CPLEX.
+  	My only access to CPLEX was on Karla Hoffman's machine at George
+ 	Mason University, requiring me to either be at GMU or log in via
+ 	the internet (slow).  Debugging facilities on her machine (an
+ 	RS-6000) were also primitive.  Using lp_solve permits me to do all
+ 	development at home or the office.  The added bonus is that the
+ 	code can now be used by anyone, even if they do not have CPLEX.
+
+	* A pair of greedy heuristics are now used to try and perturb a
+ 	fractional LP solution up to an integral one.  This is used
+ 	principally to obtain a valid upper bound early on for use in
+ 	fixing variables.
+
+	* Code was added to perform variable fixing using reduced costs.
+  	This code is currently not hooked up because the technique can
+ 	only be validly applied once an OPTIMAL solution to the LP
+ 	relaxation of the IP is obtained.  Therefore, this code is waiting
+ 	in the wings for when the real SEC separation procedure works.
+
+	* General subroutines were introduced to manage the heaps used to
+ 	access and maintain the branch-and-bound tree.  This fixes a bug
+ 	the old heaps that caused things to get out of order.
+	(The bug did not cause incorrect Steiner trees, only the
+ 	processing of nodes in a different order than desired.)
+
+	* The "-t" switch was added to both the "prep" and the "lp"
+ 	programs to permit the phase 1 CPU time to be included in the
+ 	phase 2 totals.
+
+	* Some reorganization of the code to improve structure and permit
+ 	easier addition of new intelligence to the branch-and-cut code.
+  	Several new include files were sprouted in this process.
+
+	* Added the "-u upper-bound" switch to the "lp" program to permit
+ 	the specification of an initial upper bound.
+
+	* When built using lp_solve, the "-s" switch can be specified to
+ 	enable scaling of the LP problem matrix.  The "-p" switch can also
+ 	be specified to enable lp_solve's perturbations (a so-called
+ 	"anti-degeneracy" mode).
+
+	* The "-d N" switch permits the number of input data decimal
+ 	places to be set to N.  This value really ought to be passed
+ 	transparently from "prep" to "lp" as part of the data...
+
+	* Fixed a subscript out-of-range when initializing arc capacities
+ 	of the flow formulation in the heuristic SEC separator.
+
+Sun Jul  7 00:13:03 1996  David Warme  <warme@s3i.com>
+
+	* version 1.12.
+
+	* The fractional cutset separation algorithm has been completely
+ 	replaced.  The original version solved the maximum network flow
+ 	sub-problems by formulating them as a linear program and passing
+ 	them to CPLEX.  This was going to be a good idea because CPLEX has
+	a built-in network flow solver -- it would be reasonable to assume
+	that their finely tuned commercial version would be hard for me to
+	beat.  Unfortunately things are not so simple.  My CPLEX
+	documentation is for version 2.something and claims that netopt()
+	function takes only a single obvious argument.  The CPLEX that I
+	am actually using is version 3.0, whose include file prototypes it
+	with 4 arguments (no names or comments) so it is not clear exactly
+	how to utilize this functionality.  When creating the heuristic
+	SEC separators, I actually implemented a very standard maximum
+	network flow solver whose performance has turned out to be quite a
+	bit faster than the CPLEX LP's being solved by the fractional
+	cutset separator.
+
+	* Genericized the flow solver and placed it into flow.c and
+	flow.h.
+
+	* Modified sec.c and sec.h to access this solver in the more
+ 	generic way.
+
+	* The resulting code was tested and found to be functionally
+ 	identical to its previous state.  (Changes to this point were
+ 	entirely structural, not algorithmic.)
+
+	* Finally, I scrapped and completely re-wrote the fractional
+ 	cutset separation routines in lp.c to use this new generic flow
+ 	solver instead of CPLEX.
+
+	* On large problems (128, 150, 200) the fractional cutset
+ 	separator now runs 10 to 15 times faster than before.
+
+	* The "WARNING!  empty cutset!" message that used to occur
+ 	occasionally with the old CPLEX version seem to have gone away and
+ 	are replaced with valid constraints, which is an actual
+ 	improvement (old version missed some constraints that the new one
+ 	successfully finds).
+
+	* Performance improvements on standard "rand_points N" problems:
+
+	* 70 points, 125.97 secs, 11 nodes ==> 70.84 secs, 11 nodes.
+
+	* 100 points, 280.35 secs, 3 nodes ==> 264.12 secs, 3 nodes.
+
+	* 128 points, 6101.55 secs, 3825 nodes ==> 3231.05 secs, 223
+	nodes.
+
+	* 150 points, 15008.80 secs, 8379 nodes ==> 5553.81 secs, 321
+	nodes.
+
+	* The jury is still out at N=200, but it seems faster too!
+
+Wed Jul  3 20:15:27 1996  David Warme  <warme@s3i.com>
+
+	* version 1.11.
+
+	* The "lp" program now contains a prototype Branch-and-Cut
+ 	procedure!  This means that it will solve Steiner trees with no
+ 	manual intervention!
+
+	* It actually implements "stupid branch and silly cut" because:
+
+	* The choice of branching variable is very crude, (possibly even
+	the WORST possible!).
+
+	* The next-node selection strategy used is "best node first".
+  	Although this method can be quite good, it does NOT find feasible
+ 	integer solutions very quickly at all!  Usually, the computation
+ 	is about 99% done before the first feasible integer solution is
+ 	discovered.  A better way to achieve this would be to have a fast
+ 	heuristic that trys to perturb a fractional solution into an
+ 	integer one.  If fast enough, this could be tried on EVERY LP
+ 	solution.  (This would give us a way to try variable fixing at the
+ 	root node...)
+
+	* Even the most expensive constraint generation procedures are
+ 	used at EVERY node!  This makes for a BIG grind on all but the
+ 	smallest branch trees.
+
+Tue Jun 25 03:34:00 1996  David Warme  <warme@s3i.com>
+
+	* version 1.10.
+
+	* Improved IP formulation: includes the generalized Subtour
+ 	Elimination Constraints, although these are currently separated
+ 	only heuristically.  This results in a MUCH stronger formulation:
+ 	both the "rand_points 70" and "rand_points 100" problems result in
+ 	an IP/LP gap of ZERO using this formulation.
+
+	* Problems of size 70, 100, 128, 150, and 200 have been solved
+ 	using this code!
+
+	* SEC heuristic #1 -- a simple integer cycle finder.
+
+	* SEC heuristic #2 -- reduce hypergraph to graph by superimposing
+ 	the MST's of each full set.  The resulting graph is separated
+ 	using the standard flow formulation (Trees and Cuts paper).  This
+ 	technique is very fast since the hypergraph to graph reduction is
+ 	done only once at the start.
+
+	* SEC heuristic #3 -- a slightly more expensive heuristic that
+ 	reduces the hypergraph to a graph dynamically for each separation
+ 	run.  The MST's for each full set are taken only over those
+ 	terminals that are "congested", resulting in a more appropriate
+ 	set of edges in the flow problem.
+
+	* SEC heuristic #4 -- a very expensive brute-force enumeration of
+ 	terminal subsets.  Currently this algorithm is essentially O(n)
+ 	{!!!} because it limits the CPU time to at most "n" CPU minutes
+ 	per cardinality enumerated.  Talk about LARGE constant factors!
+
+	* New program "ipcutset".  Reads the phase 1 data and a series of
+	integer solutions.  Outputs all appropriate cutset constraints in
+	CPLEX .lp format.  These may be pasted directly into the .lp file
+	with an editor.
+
+	* New program "ipcycle".  Reads the phase 1 data and a series of
+	integer solutions.  Outputs all appropriate SEC's in CPLEX .lp
+	format.  These may be pasted directly into the .lp file with an
+	editor.
+
+	* New program "kr".  Reads a point set and computes a 1-Steiner
+	tree (our own substandard implementation).
+
+Fri Feb 16 12:05:31 1996  David Warme  <warme@s3i.com>
+
+	* version 1.09.
+
+	* Prototype stuff for investigating IP formulations of the phase 2
+ 	backtrack search.  This includes several new programs.
+
+
+	* New program "prep".  Runs phase 1 and produces all phase 1
+	output data on stdout in ASCII (but cryptic machine readable)
+	form.  This form can be read by the other programs that do phase 2
+	type stuff.
+
+	* New program "ip".  Reads phase 1 data and constructs an IP
+	problem instance in CPLEX ".lp" form.  The phase 1 data can be
+	followed by a number of integer solutions (a list of full-set
+	numbers terminated by -1) in which case the generated .lp file
+	includes cutset constraints for each of the given (disconnected)
+	integer solutions.  The original experiment was to just pass this
+	IP to cplex and then iterate each integer solution back through
+	this program to get a new strengthened formulation.
+
+	* New program "prip".  Reads phase 1 data and a series of integer
+	solutions.  Output is postscript for each integer solution in
+	BIG_PLOT form.
+
+	* New program "redg".  (Reduced grid-graph):  Reads in a point
+	set, computes the full sets, and then outputs a "reduced"
+	grid-graph obtained by superimposing all of the full sets.  The
+	solution to the resulting "Steiner problem in graph" problem
+	yields a Steiner minimal tree for the rectilinear problem.  These
+	SPG problems were solved by E-mailing them to Abilio Lucena in
+	Brazil.
+
+	* New program "cycle".  Reads phase 1 data, followed by a series
+	of terminal subsets (which are usually cycles from an integer
+	solution).  For each terminal subset, the program prints out all
+	full sets that contain 2 or more of the terminals.  This
+	eliminates some of the drudgery in manually constructing
+	cycle-busting constraints.
+
+	* New program "lp".  Prototype program to generate LP relaxations
+	of the IP formulation.  Reads phase 1 data and then iteratively
+	solves the LP and generates constraints.  This version separates
+	only cutset constraints using both a zero-weight cutset (connected
+	components) and a fractional-weight cutset separation.  Note that
+	the current fractional-weight separation procedure uses the CPLEX
+	LP solver to solve maximum network flow sub-problems!  (At the
+	time this seemed easier than coding a network flow routine --
+	especially since CPLEX has a network solver built in -- if only I
+	new how to use it...)  Therefore this code is much slower than it
+	needs to be.  In any case, the constraints that are generated can
+	be added to the CPLEX .lp file with an editor, resulting in an
+	even stronger IP formulation.
+
+	* All of this experimentation gave the following results:
+
+	* The initial formulation for "rand_points 70" was not solvable by
+ 	CPLEX in any reasonable time.
+
+	* Adding only zero-weight cutsets to the formulation (with an
+ 	early version of "lp" before the flow stuff was written) resulted
+ 	in the "rand_points 70" problem finally being solved!
+
+	* Adding fractional weight cutsets only raised the objective value
+ 	a little bit.  (With manual cycle-busting, this may have gotten
+ 	"rand_points 100" solved, I don't recall.)
+
+Wed Aug 17 00:10:59 1994  David Warme  <warme@s3i.com>
+
+	* version 1.08.
+
+	* Non-functional beginnings of generalized decomposition stuff.
+  	Uses new algorithm to find articulation points quickly and
+ 	directly from the compatibility matrix.  The articulation points
+ 	are printed, but nothing else is done with them.
+
+	* More thorough but MUCH SLOWER initial pruning (-i).
+
+	* Display of full-sets in "topographical relief map" form (-r).
+
+	* Display of individual full-sets as splitting pieces (-s).
+
+	* Added -e and -o switches to rand_points.  The -e switch echos
+	the initial random seed to stderr.  The -o switch echos the
+	initial random seed to stdout.
+
+Wed May 18 11:33:35 1994  David Warme  <warme@s3i.com>
+
+	* version 1.07.
+
+	* Added proper handling of all degeneracies in the input set: 1)
+	Multiple occurrences of the same terminal.  2) Terminals with
+	identical X or Y coordinates.  3) Cross full-sets.
+
+	* The bit-mask representation has been propagated throughout.
+	Thus there is no longer any need for the old remapping of
+	terminals and full sets on sub-problems.
+
+	* Now that we supposedly can handle ALL degeneracies, we can (and
+	should) be less careful to generate test cases that are in
+	"general position."
+
+	* Although using the bit-mask representation throughout the
+	program does not constitute any tangible improvement in
+	functionality, these MASSIVE changes leave us poised for major
+	performance gains.  We should be able to use the various
+	decompositions in almost any order now.  For example, if search of
+	147 full-sets can be piece-split into several sub-problems then a
+	sufficiently large sub-problem might then break further via the
+	BCC and cycle-busting decompositions.
+
+	* In fact, it may be possible to integrate the BCC and
+	cycle-busting decomposition checks into the search for a splitting
+	piece!  This would give preference to pieces that might not be
+	"best" in the current sense, but would in fact be best after the
+	successive BCC and cycle-busting phases.  (This can be viewed as a
+	1 or 2 level "lookahead" during the selection of a splitting
+	piece...)  I believe that this could have a very dramatic impact
+	on the larger problems.
+
+	* The "fly-specs" dump of all full-sets is now annotated to
+	include the full-set numbers and tree length.  In addition, ALL
+	full-sets are now plotted BEFORE initial pruning.  This is because
+	the pruned full-sets are now RETAINED by the program, but their
+	corresponding bit in the "fset_mask" is turned off.  Therefore,
+	once a full-set is generated its full-set number (and bit position
+	in the bit-masks) is forever fixed.  Once initial pruning is done,
+	the debug output contains a list of those full-sets that do
+	remain.
+
+	* The same invariant applies to terminals also.  The point-number
+	of a terminal also never changes (nor does its bit-position in the
+	bit-masks).  Therefore, all traces of the previous and annoying
+	"renumbering" and "remapping" of points and full-sets is now gone!
+
+Fri Nov 12 23:52:48 1993  David Warme  <warme@s3i.com>
+
+	* version 1.06.
+
+	* The big news for this version is that it now implements the
+	trick of finding a single full-set that can be used to split a
+	backtrack search into several independent sub-problems, a
+	technique I have called Piece-Splitting.  This is a BIG win on
+	some problems.
+
+Thu Sep  9 20:33:20 1993  David Warme  <warme@s3i.com>
+
+	* version 1.05.
+
+	* Another search cutoff test has been added.  Given a current
+	partial solution of length X, and a best solution so far of length
+	Y, the remaining N unconnected terminals must be connected using a
+	budget of LESS than Y-X distance.  This amounts to an average of
+	(Y-X)/N distance per point.  If none of the remaining
+	(i.e. non-incompatible) full-sets can beat this ratio, then there
+	is no hope of a better total solution that includes this partial
+	solution, and we can backtrack.  This test is also a significant
+	win on most problems.
+
+	* Many command-line options have now been provided.  Simply invoke
+	main with garbage arguments for documentation on the available
+	options.
+
+	* The output is now somewhat less crude than before.  Each major
+	"plot" is annotated with the type of interconnect (SMT, MST,
+	1-Steiner, etc.), the total number of terminals, the solution
+	length, and the CPU time in seconds.  This is a great improvement,
+	although more is possible.  The output is in Postscript form.
+	Simply prepend the file "prelude.ps" to the program's output
+	before sending it to the printer.
+
+	* This version of the program implements TWO types of problem
+	decomposition: simple Bi-Connected Components, and the more
+	complicated cycle-busting method.
+
+Thu Apr 15 23:51:08 1996  David Warme  <warme@s3i.com>
+
+	* version 1.04.
+
+	* This version of the program does NOT implement any form of
+	decomposition other than the use of Bi-Connected Components.
+	However, the backtrack search now includes a very successful test
+	that seems to prune off many branches at a high level in the tree.
+	Briefly, a node can be pruned if there exists a terminal not yet
+	connected to the partial solution, such that every full-set
+	involing that terminal is incompatible with the current partial
+	solution.  This test is a *BIG* win.
+
+	* The output is currently in somewhat crude Postscript form.  If
+	you prepend the file "prelude.ps" to the output, then it should
+	print on a Postscript Printer.  I say crude mostly because the
+	output is not annotated any further than to number the terminals.
+	In particular, the tree lengths are not printed, although they do
+	appear in the output as Postscript comments...
+
+	* Various other output options are currently disabled by #if 0
+	... #endif constructs.  Most notable among these is the ability
+	to display all of the full-sets both before and after pruning in
+	both the small-plot (12 full-sets-per-page) format, and all
+	full-sets overlaid form.  We have referred to this small-plot form
+	as "fly-specks" -- although their usefulness seems to greatly
+	out-weigh the eyestrain involved.  Note that there is some
+	currently disabled debug code that does NOT generate Postscript
+	output -- beware!

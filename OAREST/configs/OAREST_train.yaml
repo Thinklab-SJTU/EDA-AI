@@ -1,0 +1,47 @@
+base:
+  seed: 0
+  # ckpt_path: None
+  # ckpt_path: "../REST/save/DAC21/rsmt50b.pt"
+  # ckpt_path: ./logs/OAREST_degree-[50,50]_obstacle-[0,0]_seed-1.log/version_0/checkpoints/last.ckpt
+  ckpt_path: None
+  log_dir: logs/
+  img_dir: results/
+  mode: train # [train, test, both]
+  model_name: OAREST
+  # batch_size: 512
+  batch_size: 4096
+  max_epochs: 500
+  min_degree: 3
+  max_degree: 10
+  min_obstacle: 0
+  max_obstacle: 0
+  obstacle_weight: 5
+  transformation: 8
+
+model:
+  lr: 0.00005
+  actor_config:
+    target: models.actor_critic.Actor
+    params:
+      max_degree: None
+  critic_config:
+    target: models.actor_critic.Critic
+    params:
+      max_degree: None
+
+data:
+  num_workers: 6
+  dataset: random # [random, rest, ispd]
+  train_val_data_config:
+    target: data.RSMT.RSMTDataset
+    params:
+      dimension: 2
+  test_data_config:
+    target: data.RSMT.RESTDataset
+    params:
+      degree: None
+  ISPD_data_config:
+    target: data.RSMT.ISPDDataset
+    params:
+      min_degree: None
+      max_degree: None

@@ -1,0 +1,118 @@
+# **********************************************************************
+#
+#	$Id: RELEASE_NOTES,v 1.3 2016/09/24 18:06:47 warme Exp $
+#
+#	File:	RELEASE_NOTES
+#	Rev:	e-3
+#	Date:	09/24/2016
+#
+#	Copyright (c) 2015, 2016 by David M. Warme, Pawel Winter, and
+#	Martin Zachariasen.  This work is licensed under a Creative
+#	Commons Attribution 4.0 International License.
+#
+# **********************************************************************
+#
+#	Modification Log:
+#
+#	e-1:	12/12/2015	warme
+#		: For version 5.0.1.
+#	e-2:	09/05/2016	warme
+#		: For version 5.1.
+#		: Change notices for 5.1 release.
+#	e-3:	09/24/2016	warme
+#		: Additional tweaks for 5.1 release.
+#
+# **********************************************************************
+
+
+1.	What has changed?
+
+GeoSteiner 5.1 contains two significant enhancements that provide
+additional functionality over the previous release (5.0.1):
+
+ * The rand_points program has been significantly reworked:
+
+	- A new (third) pseudo-random number generator algorithm has
+	  been added.  It uses the AES-256 block cipher as its
+	  fundamental entropy source and produces exceptionally random
+	  bits.
+
+	- The command line arguments have been significantly reworked to
+	  provide a "binary" mode, direct support for updatable random
+	  seed state files, and the ability to more consistently choose
+	  between the various pseudo-random number generator algorithms
+	  provided.
+
+	- Each pseudo-random number generator is now encapsulated in its
+	  own source file behind a well-encapsulated "object" interface.
+
+ * The efst program has the ability to save its generated FSTs as
+   instances of the Steiner problem in graphs in SteinLib format.
+   Previously, the edge weights in these graph instances were always
+   stored as floating-point numbers.  This release adds the ability to
+   express the edge weights as integers (scaled by a suitable power of
+   10) in order to feed graph solvers that work only with integer edge
+   weights.
+
+   These integer weights can be arbitrary-precision integers.  The user
+   selects the number K of significant bits that are desired.  Let MST
+   be the length of the Euclidean minimum spanning tree.  The efst
+   program automatically chooses a suitable power 10**M to multiply
+   the "real" edge weights by before rounding them to integer values.
+   This scale factor 10**M is chosen to be as large as possible, while
+   assuring that
+
+	0 <= (9/8) * MST <= 2**K - 1
+
+   This maximizes the number of significant digits being carried, while
+   providing a reasonable degree of assurance that integer-weight graph
+   solvers can solve the scaled instances without much fear of provoking
+   overflows when using fixed K-bit precision integer arithmetic.
+
+   Finally, let $f$ be a generated Euclidean FST of length $w_f$.  FST
+   $f$ gives rise to a cluster of graph edges, each having lengths that
+   are quite ugly "real" values.  The scaled integer weights for these
+   edges are "creatively rounded" so that their integer sum yields
+   exactly
+
+		floor (10**M * w_f + 0.5)
+
+   i.e., the properly rounded integer value of the FST as a whole.
+   Significantly more quantization error would result if this creative
+   rounding were not performed.
+
+ * Add -Wall -Werror to the compiler options.  Fix all of the issues
+   thereby detected.
+
+ * Eliminate "rename.h", which was a quick-and-dirty way to achieve a
+   clean namespace within libgeosteiner.a (i.e., all globally defined
+   symbols beginning with either gst_ or _gst_).  All names that need to
+   have these prefixes now have them throughout the entire code base.
+
+ * Major reorganization of the include files.  The previous need for
+   "rename.h" to be included *before* anything else produced a rat's
+   nest of header dependencies.  The "general.h" header has been
+   eliminated, "steiner.h" greatly reduced in size, and about 18 new
+   header files created.  All header files now satisfy the properties of
+   "completeness" and "minimality".  In addition, the signatures for all
+   global functions provided by "foo.c" now reside in a corresponding
+   header named "foo.h".  To assure completeness, "foo.h" is always the
+   first header included by "foo.c".
+
+ * The FATAL() error mechanism was replaced with a more useful one.
+
+ * Conversion of cputime_t to and from seconds (in either "int" or
+   "double" form) has now been centralized and cleaned up.  The
+   TICKS_PER_SEC macro is now used only in cputime.c.
+
+ * Eliminate "config.h" control over both local cuts and
+   checkpoint-restart.  Both of these features are now included
+   unconditionally.
+
+ * Improve floating-point unit management code to address both the x87
+   and the SSE/SSE7 FPUs.  Eliminate old -ffloat-store hack.  Also
+   eliminated the old "floating-point precision fix" config.h option,
+   which is no longer needed.
+
+ * Fix all of the --with-FOO configuration options so that they all
+   work correctly now.

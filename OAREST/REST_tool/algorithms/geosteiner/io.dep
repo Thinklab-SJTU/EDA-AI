@@ -1,0 +1,4 @@
+io.o io.lo io.dep : io.c io.h geomtypes.h fatal.h geosteiner.h logic.h memory.h \
+ prepostlude.h environment.h config.h gsttypes.h lpsolver.h \
+ $(LP_DEPS)  fputils.h steiner.h \
+ bitmaskmacros.h

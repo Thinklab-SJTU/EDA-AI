@@ -1,0 +1,3 @@
+expand.o expand.lo expand.dep : expand.c expand.h bitmaskmacros.h gsttypes.h bb.h lpsolver.h \
+ config.h logic.h $(LP_DEPS)  environment.h \
+ polltime.h cputime.h constrnt.h fatal.h steiner.h geomtypes.h
