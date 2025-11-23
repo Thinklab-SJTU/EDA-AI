@@ -86,7 +86,13 @@ def gene_input(env, nets, routes_info, grid, bm_name, scale=128, mode='clip',
     while line < n_line:
         net_id = str(routes_info[line][1])
         net_name = routes_info[line][0]
-        
+
+        condition_img = np.zeros((env.n_x, env.n_y, 3), dtype=np.dtype('uint8'))
+        condition_img[:, :, 1] = env.planar_cap[:, :, 0]
+        condition_img[:, :, 2] = env.planar_cap[:, :, 1]
+        for pin in nets[net_name]['pins']:
+            condition_img[pin[0], pin[1], 0] = 255
+
         route_img = torch.zeros(grid[0], grid[1])
         while routes_info[line+1][0] != '!':
             line += 1
@@ -114,12 +120,6 @@ def gene_input(env, nets, routes_info, grid, bm_name, scale=128, mode='clip',
                f'c: {c_len}/15000, d: {d_len}/15000, min_cap: {min_cap}', end='\r')
         if min_cap > 0:
             continue
-        
-        condition_img = np.zeros((env.n_x, env.n_y, 3), dtype=np.dtype('uint8'))
-        condition_img[:, :, 1] = env.planar_cap[:, :, 0]
-        condition_img[:, :, 2] = env.planar_cap[:, :, 1]
-        for pin in nets[net_name]['pins']:
-            condition_img[pin[0], pin[1], 0] = 255
 
         # only one pixel
         if route_img.sum().item() <= 255:
